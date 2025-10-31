@@ -1,0 +1,47 @@
+@mixin heading {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0px;
+  width: 100%;
+  background-color: var(--background-site);
+  // background: var(--fade-gradient-vertical);
+  z-index: 5;
+  padding-bottom: 12px;
+  display:flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  color: #AAA;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--text-secondary-2);
+  // text-transform: uppercase;
+  >div{
+    display: flex;
+    >span {
+      color: var(--text-tertiary-2);
+      text-transform: lowercase;
+      margin-left: 6px;
+    }
+  }
+}
+
+.headingTrending {
+  @include heading();
+}
+
+.noNotes {
+  color: var(--text-tertiary-2);
+  text-transform: lowercase;
+}
+
+.articles {
+  margin-bottom: 32px;
+  >a {
+    border-bottom: 1px solid var(--devider);
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}

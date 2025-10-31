@@ -1,0 +1,206 @@
+@mixin controlButton {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background-color: unset;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  opacity: 0.7;
+  transition: opacity 0.4s;
+
+  &:hover {
+    opacity: 1;
+    transition: opacity 0.4s;
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+.feedItem {
+  width: 100%;
+  background-color: var(--background-site);
+  padding-inline: 20px;
+  padding-block: 8px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  &:hover, &:focus {
+    background-color: var(--background-input);
+  }
+
+  .feedInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    .feedName {
+      color: var(--text-primary);
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 20px;
+
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+
+    .feedDescription {
+      color: var(--text-tertiary);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 16px;
+
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+  }
+
+  .controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    .manageControls {
+      display: flex;
+      align-items: center;
+
+      .feedEnabled {
+        display: flex;
+        cursor: pointer;
+      }
+
+      .mngButton {
+        @include controlButton();
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+
+        &:disabled {
+          .deleteButton, .editButton {
+            background-color: var(--subtile-devider);
+          }
+        }
+      }
+
+      .deleteButton {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        margin: 0px 0px;
+        background-color: var(--text-tertiary-2);
+        -webkit-mask: url(../../assets/icons/delete.svg) no-repeat 0px / 20px;
+        mask: url(../../assets/icons/delete.svg) no-repeat 0px / 20px;
+      }
+
+      .editButton {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        margin: 0px 0px;
+        background-color: var(--text-tertiary-2);
+        -webkit-mask: url(../../assets/icons/edit.svg) no-repeat 0px / 20px;
+        mask: url(../../assets/icons/edit.svg) no-repeat 0px / 20px;
+      }
+
+      .sortButton {
+        @include controlButton();
+        width: 36px;
+        height: 36px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: grab;
+      }
+    }
+  }
+
+
+  .feedEdit {
+    position: relative;
+    width: 100%;
+    .feedNameInput {
+      height: 32px;
+      background-color: var(--background-header-input);
+      color: var(--text-tertiary);
+      font-size: 16px;
+      line-height: 14px;
+      font-weight: 400;
+      margin: 0;
+      border: none;
+      box-shadow: none;
+      outline: none;
+      border-radius: 16px;
+    }
+    .feedEditControl {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      height: 28px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      >button {
+        @include controlButton();
+        width: 20px;
+        height: 28px;
+      }
+    }
+
+  }
+}
+
+.dragIcon {
+  width: 36px;
+  height: 36px;
+  display: inline-block;
+  margin: 0px 0px;
+  background-color: var(--text-tertiary-2);
+  -webkit-mask: url(../../assets/icons/hamburger.svg) no-repeat center;
+  mask: url(../../assets/icons/hamburger.svg) no-repeat center;
+}
+
+.closeIcon {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  margin: 0px 0px;
+  background-color: var(--text-secondary);
+  -webkit-mask: url(../../assets/icons/close.svg) no-repeat center;
+  mask: url(../../assets/icons/close.svg) no-repeat center;
+}
+
+.checkIcon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  margin: 0px 0px;
+  background-color: var(--text-secondary);
+  -webkit-mask: url(../../assets/icons/check.svg) no-repeat 0 / 100%;
+  mask: url(../../assets/icons/check.svg) no-repeat 0 / 100%;
+}
+
+.draggedBefore {
+  border-top: solid 1px var(--subtile-devider);
+}
+
+.draggedAfter {
+  border-bottom: solid 1px var(--subtile-devider);
+}
+
+.draggedItem {
+  opacity: 0.6;
+}

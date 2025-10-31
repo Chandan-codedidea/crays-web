@@ -1,0 +1,153 @@
+.search {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 18px;
+  background-color: var(--background-header-input);
+  width: var(--search-input-width);
+  height: 36px;
+  margin-left: 8px;
+  margin-bottom: 0;
+
+  @media only screen and (max-width: 720px) {
+    width: calc(100dvw - 92px);
+  }
+
+  &.phoneSearch {
+    width: calc(100dvw - 92px);
+  }
+
+
+  &:hover {
+    input {
+      color: var(--text-primary);
+    }
+
+    .searchIcon {
+      background-color: var(--text-primary);
+    }
+  }
+
+  input {
+    width: calc(var(--search-input-width) - 60px);
+    height: 36px;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 20px;
+    padding: 0;
+    margin-left: 10px;
+    margin-bottom: 0px;
+    border: none;
+    background-color: none;
+    color: var(--text-tertiary);
+
+    &:focus {
+      border: none;
+      box-shadow: none;
+    }
+
+
+    &::placeholder {
+      color: var(--text-tertiary);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 20px;
+    }
+  }
+
+  .searchIcon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-left: 16px;
+
+    background-color: var(--text-tertiary);
+    -webkit-mask: url(../../assets/icons/search.svg) 0 0/18px 18px;
+    mask: url(../../assets/icons/search.svg) 0 0/18px 18px;
+  }
+
+  &.wide {
+    width: 600px;
+
+    input {
+      width: 100%;
+    }
+  }
+}
+
+.searchIconDark {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+
+  background-color: var(--text-tertiary-2);
+  -webkit-mask: url(../../assets/icons/search.svg) 0 0/18px 18px;
+  mask: url(../../assets/icons/search.svg) 0 0/18px 18px;
+}
+
+.searchHolder {
+  position: relative;
+  width: calc(var(--search-input-width) + 16px);
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-radius: 12px;
+
+  &.focused {
+    background-color: var(--background-input);
+  }
+
+  &.wideHolder {
+    width: 608px;
+  }
+
+  &.phoneSearch {
+    width: fit-content;
+  }
+
+  @media only screen and (max-width: 720px) {
+    width: calc(100dvw - 92px);
+  }
+}
+
+.searchSuggestions {
+  margin-top: 8px;
+  width: calc(var(--search-input-width) + 16px);
+  visibility: visible;
+  display: block;
+
+  &.hidden {
+    display: none;
+    visibility: hidden;
+    height: 0;
+  }
+
+  &.wide {
+    margin-top: 28px;
+    width: 100%;
+  }
+}
+
+.loadingOverlay {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 96px);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  >div {
+    position: relative;
+    opacity: 1;
+  }
+}
+
+.searchIcon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+
+  background-color: var(--text-primary);
+  -webkit-mask: url(../../assets/icons/search.svg) 0 0/18px 18px;
+  mask: url(../../assets/icons/search.svg) 0 0/18px 18px;
+}

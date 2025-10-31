@@ -1,0 +1,1074 @@
+@mixin highlight {
+  border-radius: 99999px;
+  /* overflow: hidden */
+}
+
+.legend_GOLD {
+  @include highlight;
+  background: var(--legend-gold) !important;
+}
+.legend_AQUA {
+  @include highlight;
+  background: var(--legend-aqua) !important;
+}
+.legend_SILVER {
+  @include highlight;
+  background: var(--legend-silver) !important;
+}
+.legend_PURPLE {
+  @include highlight;
+  background: var(--legend-purple) !important;
+}
+.legend_PURPLEHAZE {
+  @include highlight;
+  background: var(--legend-purplehaze) !important;
+}
+.legend_TEAL {
+  @include highlight;
+  background: var(--legend-teal) !important;
+}
+.legend_BROWN {
+  @include highlight;
+  background: var(--legend-brown) !important;
+}
+.legend_BLUE {
+  @include highlight;
+  background: var(--legend-blue) !important;
+}
+.legend_SUNFIRE {
+  @include highlight;
+  background: var(--legend-sunfire) !important;
+}
+
+.legend_WHITE {
+  @include highlight;
+  background: #FFFFFF !important;
+}
+
+.legend_glow_GOLD {
+  --glow-color: var(--legend-glow-gold);
+}
+.legend_glow_AQUA {
+  --glow-color: var(--legend-glow-aqua);
+}
+.legend_glow_SILVER {
+  --glow-color: var(--legend-glow-silver);
+}
+.legend_glow_PURPLE {
+  --glow-color: var(--legend-glow-purple);
+}
+.legend_glow_PURPLEHAZE {
+  --glow-color: var(--legend-glow-purplehaze);
+}
+.legend_glow_TEAL {
+  --glow-color: var(--legend-glow-teal);
+}
+.legend_glow_BROWN {
+  --glow-color: var(--legend-glow-brown);
+}
+.legend_glow_BLUE {
+  --glow-color: var(--legend-glow-blue);
+}
+.legend_glow_SUNFIRE {
+  --glow-color: var(--legend-glow-sunfire);
+}
+
+@mixin avatar {
+  position: relative;
+  // background: var(--background-site);
+  border-radius: 50%;
+  padding: 1px;
+
+  img {
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    vertical-align: top;
+  }
+
+
+  .centerBottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .liveBadge {
+    width: fit-content;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-inline: 6px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    background-color: var(--background-site);
+    border-radius: 10px;
+
+    .liveDot {
+      width: 8px;
+      height: 8px;
+      display: inline-block;
+      margin: 0px 0px;
+      background-color: #E00;
+      -webkit-mask: url(../../assets/icons/dot.svg) no-repeat 0/100%;
+      mask: url(../../assets/icons/dot.svg) no-repeat 0/100%;
+    }
+
+    .caption {
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 11px;
+    }
+  }
+}
+
+.verifiedIcon {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin: 0px 0px;
+  background-color: var(--accent);
+  -webkit-mask: url(../../assets/icons/verified.svg) no-repeat 0px / 15px;
+  mask: url(../../assets/icons/verified.svg) no-repeat 0px / 15px;
+}
+
+@mixin iconBackground {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.nanoAvatar {
+  @include avatar;
+  width: 18px;
+  height: 18px;
+  padding: 1px;
+
+  .missingBack {
+    width: 16px;
+    height: 16px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: -6px;
+    right: -6px;
+  }
+
+  .liveBadge {
+    display: none;
+  }
+
+  &.legend {
+    width: 18px;
+    height: 18px;
+    .missingBack {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.microAvatar {
+  @include avatar;
+  width: 22px;
+  height: 22px;
+  padding: 1px;
+
+  .missingBack {
+    width: 20px;
+    height: 20px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: -6px;
+    right: -6px;
+  }
+
+  .liveBadge {
+    display: none;
+  }
+
+  &.legend {
+    width: 22px;
+    height: 22px;
+
+    .missingBack {
+      width: 20px;
+      height: 20px;
+      border: 0.5px solid var(--background-site);
+    }
+  }
+}
+
+.xxsAvatar {
+  @include avatar;
+  width: 28px;
+  height: 28px;
+  padding: 1px;
+
+  .missingBack {
+    width: 26px;
+    height: 26px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: -6px;
+    right: -6px;
+  }
+
+  .liveBadge {
+    display: none;
+  }
+
+  &.legend {
+    width: 28px;
+    height: 28px;
+    // padding: 0;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 26px;
+      height: 26px;
+    }
+  }
+}
+
+.xssAvatar {
+  @include avatar;
+  width: 26px;
+  height: 26px;
+  padding: 1px;
+
+  .missingBack {
+    border: 1px solid var(--background-site);
+    width: 24px;
+    height: 24px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: -6px;
+    right: -6px;
+  }
+
+  .liveBadge {
+    display: none;
+  }
+
+  &.legend {
+    width: 26px;
+    height: 26px;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+.xsAvatar {
+  @include avatar;
+  width: 32px;
+  height: 32px;
+  padding: 1px;
+
+  .missingBack {
+    width: 30px;
+    height: 30px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: -6px;
+    right: -6px;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 30px;
+      height: 30px;
+    }
+  }
+
+  .liveBadge {
+    height: 12px;
+    gap: 2px;
+
+    .liveDot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .caption {
+      font-size: 9px;
+      line-height: 9px;
+    }
+  }
+}
+
+.s30Avatar {
+  @include avatar;
+  width: 30px;
+  height: 30px;
+  padding: 1px;
+
+  .missingBack {
+    width: 26px;
+    height: 26px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: -6px;
+    right: -6px;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  .liveBadge {
+    height: 12px;
+    gap: 2px;
+
+    .liveDot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .caption {
+      font-size: 9px;
+      line-height: 9px;
+    }
+  }
+}
+
+.vvsAvatar {
+  @include avatar;
+  width: 36px;
+  height: 36px;
+  padding: 1px;
+
+  .missingBack {
+    width: 32px;
+    height: 32px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: -6px;
+    right: -6px;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .liveBadge {
+    height: 12px;
+    gap: 2px;
+
+    .liveDot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .caption {
+      font-size: 9px;
+      line-height: 9px;
+    }
+  }
+}
+
+.s38Avatar {
+  @include avatar;
+  width: 38px;
+  height: 38px;
+  padding: 2px;
+
+  .missingBack {
+    width: 34px;
+    height: 34px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: -6px;
+    right: -6px;
+  }
+
+  &.legend {
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 34px;
+      height: 34px;
+    }
+  }
+
+
+  .liveBadge {
+    height: 12px;
+    gap: 2px;
+
+    .liveDot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .caption {
+      font-size: 9px;
+      line-height: 9px;
+    }
+  }
+}
+
+.vs2Avatar {
+  @include avatar;
+  width: 40px;
+  height: 40px;
+  padding: 1px;
+
+  .missingBack {
+    width: 36px;
+    height: 36px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+
+  .liveBadge {
+    height: 12px;
+    gap: 2px;
+
+    .liveDot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .caption {
+      font-size: 9px;
+      line-height: 9px;
+    }
+  }
+}
+
+.vsAvatar {
+  @include avatar;
+  width: 42px;
+  height: 42px;
+  padding: 1px;
+
+  .missingBack {
+    width: 38px;
+    height: 38px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 38px;
+      height: 38px;
+    }
+  }
+
+  .liveBadge {
+    height: 12px;
+    gap: 2px;
+
+    .liveDot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .caption {
+      font-size: 9px;
+      line-height: 9px;
+    }
+  }
+}
+
+.smallAvatar {
+  @include avatar;
+  width: 44px;
+  height: 44px;
+  padding: 1px;
+
+  .missingBack {
+    width: 40px;
+    height: 40px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  .liveBadge {
+    height: 12px;
+    gap: 2px;
+
+    .liveDot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .caption {
+      font-size: 9px;
+      line-height: 9px;
+    }
+  }
+}
+
+
+.s50Avatar {
+  @include avatar;
+  width: 50px;
+  height: 50px;
+  padding: 2px;
+
+  .missingBack {
+    width: 46px;
+    height: 46px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 46px;
+      height: 46px;
+    }
+  }
+
+  .liveBadge {
+    height: 12px;
+    gap: 2px;
+
+    .liveDot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .caption {
+      font-size: 9px;
+      line-height: 9px;
+    }
+  }
+}
+
+.midAvatar {
+  @include avatar;
+  width: 52px;
+  height: 52px;
+  padding: 1px;
+
+  .missingBack {
+    width: 48px;
+    height: 48px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  .liveBadge {
+    height: 12px;
+    gap: 2px;
+
+    .liveDot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .caption {
+      font-size: 9px;
+      line-height: 9px;
+    }
+  }
+}
+
+.mlAvatar {
+  @include avatar;
+  width: 60px;
+  height: 60px;
+  padding: 3.5px;
+
+  .missingBack {
+    width: 52px;
+    height: 52px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 52px;
+      height: 52px;
+    }
+  }
+
+  .liveBadge {
+    height: 18px;
+
+    .liveDot {
+      width: 6px;
+      height: 6px;
+    }
+
+    .caption {
+      font-size: 10px;
+      line-height: 10px;
+    }
+  }
+}
+
+.mllAvatar {
+  @include avatar;
+  width: 64px;
+  height: 64px;
+  padding: 1px;
+
+  .missingBack {
+    width: 60px;
+    height: 60px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 0.5px solid var(--background-site);
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  .liveBadge {
+    height: 18px;
+
+    .liveDot {
+      width: 6px;
+      height: 6px;
+    }
+
+    .caption {
+      font-size: 10px;
+      line-height: 10px;
+    }
+  }
+}
+
+.largeAvatar {
+  @include avatar;
+  width: 72px;
+  height: 72px;
+  padding: 3.5px;
+
+  .missingBack {
+    width: 66px;
+    height: 66px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: 3px;
+    right: 3px;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 1px solid var(--background-site);
+      width: 66px;
+      height: 66px;
+    }
+  }
+
+  .liveBadge {
+    height: 18px;
+
+    .liveDot {
+      width: 6px;
+      height: 6px;
+    }
+
+    .caption {
+      font-size: 10px;
+      line-height: 10px;
+    }
+  }
+}
+
+.extraLargeAvatar {
+  @include avatar;
+  width: 80px;
+  height: 80px;
+  padding: 2.5px;
+
+  .missingBack {
+    width: 74px;
+    height: 74px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: 4px;
+    right: 4px;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 1px solid var(--background-site);
+      width: 74px;
+      height: 74px;
+    }
+  }
+
+  &.borderRing {
+    .missingBack {
+      border: 4px solid var(--background-site);
+    }
+  }
+}
+
+.xxlAvatar {
+  @include avatar;
+  width: 120px;
+  height: 120px;
+  padding: 3.5px;
+
+  .missingBack {
+    width: 112px;
+    height: 112px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: 4px;
+    right: 4px;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 1px solid var(--background-site);
+      width: 112px;
+      height: 112px;
+    }
+  }
+
+  &.borderRing {
+    .missingBack {
+      border: 4px solid var(--background-site);
+    }
+  }
+}
+
+.xxxlAvatar {
+  @include avatar;
+  width: 128px;
+  height: 128px;
+  padding: 5.5px;
+
+  .missingBack {
+    width: 118px;
+    height: 118px;
+  }
+
+  .iconBackground {
+    @include iconBackground;
+    bottom: 4px;
+    right: 4px;
+  }
+
+  &.legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .missingBack {
+      border: 1px solid var(--background-site);
+      width: 118px;
+      height: 118px;
+    }
+  }
+
+  &.borderRing {
+    .missingBack {
+      border: 4px solid var(--background-site);
+    }
+  }
+}
+
+.missingBack {
+  background-color: var(--background-site);
+  border-radius: 50%;
+}
+
+@mixin missing {
+  display: grid;
+  place-items: center;
+  color: var(--missing-avatar-text);
+  background-color: var(--subtile-devider);
+  border-radius: 50%;
+  mask-image: url(../../assets/icons/default_avatar.svg);
+  mask-repeat: no-repeat;
+  -webkit-mask-image: url(../../assets/icons/default_avatar.svg);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.nanoMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+}
+
+.microMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+}
+
+.xxsMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+}
+
+.xssMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+}
+
+.xsMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+}
+
+.vvsMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+}
+
+.s38Missing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+}
+
+.vs2Missing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+}
+
+.vsMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+}
+
+.smallMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 12px;
+}
+
+.midMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+}
+
+.mlMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+}
+
+.mllMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+}
+
+.largeMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+}
+
+.extraLargeMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 20px;
+}
+
+.xxlMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 20px;
+}
+
+.xxxlMissing {
+  @include missing;
+  width: 100%;
+  height: 100%;
+  font-size: 20px;
+}
+
+.highlightBorder {
+  background: none;
+  // padding: 2px;
+}
+
+.cacheFlag {
+  img {
+    filter: sepia(100%) saturate(300%) brightness(70%) hue-rotate(300deg) blur(0.1rem);
+  }
+}

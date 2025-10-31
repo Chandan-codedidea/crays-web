@@ -1,0 +1,59 @@
+.modal {
+  width: 440px;
+  color: var(--text-secondary);
+  background-color: var(--background-input);
+  border-radius: 8px;
+
+  display: flex;
+  flex-direction: column;
+
+  .title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 20px;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+  }
+
+  .description {
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 20px;
+    margin-bottom: 28px;
+  }
+
+  .inputs {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 4px;
+    > div {
+      margin-bottom: 4px;
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+
+    button {
+      width: fit-content;
+      min-width: 192px;
+      margin: 0px;
+      padding: 10px;
+    }
+  }
+
+  .alternative {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 24px;
+  }
+
+}
+
+.hidden {
+  display: none;
+}

@@ -1,0 +1,62 @@
+.post {
+  position: relative;
+  background-color: var(--background-card);
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  padding-top: 0;
+  border-radius: 0;
+  border: none;
+
+  .content {
+    grid-area: content;
+    display: flex;
+    flex-direction: column;
+    margin-left: 2px;
+    margin-top: 2px;
+    cursor: text;
+
+
+    .message {
+      position: relative;
+      grid-area: message;
+      color: var(--text-primary);
+      word-break: break-word;
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 24px;
+      width: 100%;
+      margin-bottom: 12px;
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .messageFade {
+        position: absolute;
+        z-index: 1;
+        top: 610px;
+        left: 0;
+        pointer-events: none;
+        background-image: var(--fade-note-vertical);
+        width: 100%;
+        height: 40px;
+      }
+
+    }
+  }
+}
+
+
+@media only screen and (max-width: 720px) {
+  .post {
+    width: 100vw;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-right: 12px;
+    .content {
+      margin-left: 0px;
+    }
+  }
+
+}

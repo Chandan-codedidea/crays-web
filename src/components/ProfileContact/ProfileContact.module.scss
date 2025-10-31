@@ -1,0 +1,93 @@
+.profileContact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--background-input);
+  padding: 12px;
+  // width: var(--center-col-w);
+
+  @media only screen and (max-width: 720px) {
+    padding: 0;
+  }
+
+  .info {
+    display: flex;
+    justify-content: space-between;
+    text-decoration: none;
+    padding-left: 8px;
+    padding-right: 16px;
+
+    .personal {
+      display: flex;
+      justify-content: flex-start;
+
+      .profileInfo {
+        display: flex;
+        flex-direction: column;
+        padding-left: 8px;
+
+        .name {
+          color: var(--text-primary);
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 16px;
+          max-width: 362px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+
+          @media only screen and (max-width: 720px) {
+            max-width: 140px;
+          }
+        }
+
+        .nip05 {
+          color: var(--text-tertiary-2);
+          font-size: 14px;
+          font-weight: 400;
+          line-height: 14px;
+          span {
+            display: inline-block;
+            max-width: 308px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: normal;
+
+            @media only screen and (max-width: 720px) {
+              max-width: 140px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .action {
+    display: flex;
+    justify-content: flex-end;
+
+    .stats {
+      margin-right: 8px;
+      .number {
+        color: var(--text-primary);
+        text-align: right;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 16px;
+      }
+
+      .label {
+        color: var(--text-tertiary-2);
+        text-align: right;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 14px;
+        text-transform: lowercase;
+      }
+    }
+  }
+}
+
+.placeholderDiv {
+  width: 72px;
+}

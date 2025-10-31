@@ -1,0 +1,351 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.missingImage {
+  border: 1px solid red;
+}
+
+.profileTabs {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: 8px;
+  // background-color: var(--background-card);
+  width: 100%;
+  border-radius: 0;
+  padding-top: 14px;
+  border-bottom: 1px solid var(--devider);
+  border-top: none;
+}
+
+
+[data-animated="true"] {
+  .profileTabs {
+    opacity: 0;
+
+    animation: fadeIn var(--profile-animation-duration) ease-in forwards;
+    animation-delay: var(--profile-card-animation-delay);
+  }
+
+}
+
+.profileTab {
+  position: relative;
+  display: inline-block;
+  padding-inline: 14px;
+  padding-block: 2px;
+  border: none;
+  background: none;
+  width: fit-content;
+  height: 40px;
+  margin: 0;
+  margin-bottom: 12px;
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.profileTabIndicator {
+  position: absolute;
+  height: 4px;
+  top: 62px;
+  left: 0;
+  border-radius: 2px 2px 0px 0px;
+  background: var(--accent);
+  transition: all 250ms;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  .statNumber {
+    font-size: 24px;
+    font-weight: 300;
+    line-height: 24px;
+    color: var(--text-primary);
+  }
+
+  .statName {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16px;
+    color: var(--text-tertiary-2);
+    text-transform: lowercase;
+  }
+}
+
+.profileNotes {
+  position: relative;
+}
+
+.mutedProfile {
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 20px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  overflow: hidden;
+  line-break: anywhere;
+
+  button {
+    margin: 8px;
+    padding: 0;
+    margin-left: 8px;
+    background: none;
+    border: none;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 20px;
+    color: var(--accent-2);
+    width: auto;
+    height: auto;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+}
+
+.separator {
+  display: block;
+  width: 24px;
+}
+
+.zapItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--background-input);
+  padding-block: 12px;
+  padding-inline: 20px;
+  width: min(ver(--center-col-w), 100%);
+  text-decoration: none;
+
+  .zapInfo {
+    display: flex;
+    flex-direction: column;
+    width: min(560px, 100%);
+    min-height: 32px;
+    padding-inline: 8px;
+
+    .zapHeader {
+      display: flex;
+      justify-content: flex-start;
+
+      .zapName {
+        color: var(--text-primary);
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 16px;
+        margin-bottom: 2px;
+      }
+      .zapTime {
+        color: var(--text-tertiary-2);
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 14px;
+        margin: 0px 2px;
+        min-width: 80px;
+        &::before {
+          content: "|";
+          padding: 0px 2px;
+        }
+      }
+    }
+
+    .zapMessage {
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 14px;
+      max-width: 460px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .zapValue {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .zapAmount {
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 16px;
+      margin-bottom: 2px;
+      min-width: 32px;
+      text-align: center;
+    }
+    .zapUnit {
+      color: var(--text-tertiary-2);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 14px;
+      text-transform: lowercase;
+      text-align: center;
+    }
+  }
+}
+
+.totalSats {
+  padding-top: 16px;
+  padding-left: 16px;
+  margin-bottom: 16px;
+  .totalSatsLabel {
+    color: var(--text-tertiary);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 18px;
+    margin-right: 6px;
+  }
+
+  .totalSatsAmount {
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 18px;
+    text-transform: lowercase;
+    span {
+      margin-right: 6px;
+    }
+  }
+}
+
+.tabContent {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.profileRelays {
+  border-radius: 8px;
+  overflow: hidden;
+  .profileRelay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: 11px;
+    padding-inline: 16px;
+    background-color: var(--background-card);
+    border-bottom: 1px solid var(--background-input);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .relayIcon {
+      width: 18px;
+      height: 18px;
+      background-color: var(--text-secondary);
+      margin-inline: 8px;
+      -webkit-mask: url(../../assets/icons/global.svg) no-repeat 0 / 100%;
+      mask: url(../../assets/icons/global.svg) no-repeat 0 / 100%;
+    }
+
+    .relayUrl {
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+      width: min(560px, 100%);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+}
+
+.profileTabsPlaceholder {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: 8px;
+  background-color: var(--background-card);
+  width: 100%;
+  height: 74px;
+  border-radius: 0 0 8px 8px;
+  padding-top: 22px;
+}
+
+.loader {
+  min-height: 60px;
+  padding-top: 40px;
+  background: none;
+}
+
+@media only screen and (max-width: 720px) {
+  .profileTab {
+    &[data-key=zaps], &[data-key=relays] {
+      display: none;
+    }
+  }
+  .zapInfo {
+    max-width: 86%;
+  }
+  .zapMessage {
+    max-width: 80% !important;
+  }
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: 148px 148px 148px 148px;
+  grid-column-gap: 2px;
+  grid-row-gap: 2px;
+  padding-inline: 20px;
+  padding-top: 12px;
+
+  img {
+    object-fit: cover;
+    width: 148px;
+    height: 148px;
+  }
+}
+
+.profileZaps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+
+  @media only screen and (max-width: 720px) {
+    padding: 18px 12px;
+  }
+}
+
+// .galleryGrid {
+//   display: flex;
+//   flex-wrap: wrap;
+//   width: 640px;
+//   gap: 2px;
+
+//   .galleryColumn {
+//     flex: 33%;
+//     max-width: 33%;
+//   }
+
+  // >div {
+  //   flex-grow: 1;
+  // }
+// }

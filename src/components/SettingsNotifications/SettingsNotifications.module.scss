@@ -1,0 +1,21 @@
+.notificationSettings {
+  display: flex;
+  flex-direction: column;
+
+  ul {
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  li {
+    list-style-type: none;
+  }
+}
+
+.caption {
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 20px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}

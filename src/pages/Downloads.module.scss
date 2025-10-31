@@ -1,0 +1,411 @@
+.callToAction, .callToActionAndroid, .callToActionIOS {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .ctaTitle {
+    color: var(--text-primary);
+    text-align: center;
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 36px;
+    margin-bottom: 8px;
+  }
+
+  .ctaDescription {
+    color: var(--text-secondary-2);
+    text-align: center;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    max-width: 430px;
+  }
+}
+
+.callToActionAndroid, .callToActionIOS {
+  display: none;
+}
+
+.downloadsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  border-top: 1px solid var(--devider);
+  padding-top: 20px;
+}
+
+.appInfo {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 12px;
+  padding-inline: 20px;
+
+  >div {
+    display: flex;
+    width: 190px;
+    height: 154px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 20px;
+    border-radius: 12px;
+  }
+}
+
+.qrCode {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--background-input);
+
+  img {
+    width: 92px;
+    border-radius: 4px;
+  }
+
+  .qrCaption {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 12px;
+  }
+}
+
+
+.appStore {
+
+  background-color: var(--background-input);
+
+  .desktopCTA {
+    color: var(--text-primary);
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  .buidDetails {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    color: var(--text-tertiary-2);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 12px;
+    margin-top: 4px;
+
+    >div:first-child {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      // margin-right: 8px;
+    }
+    >div:last-child {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-transform: capitalize;
+    }
+  }
+
+  >a {
+    margin-top: 16px;
+    width: 120px;
+    height: 40px;
+  }
+}
+
+.playStore {
+
+  background-color: var(--background-input);
+
+  .playstoreLink {
+    margin-top: 16px;
+  }
+
+  .apkLink {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    margin-top: 16px;
+  }
+
+  .desktopCTA {
+    color: var(--text-primary);
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  .buidDetails {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    color: var(--text-tertiary-2);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 12px;
+    margin-top: 4px;
+    text-align: center;
+
+    >div:first-child {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      // margin-right: 8px;
+    }
+
+    >div:last-child {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-transform: capitalize;
+    }
+  }
+}
+
+.promoVideo {
+  // width: 600px;
+  height: 337px;
+  display: flex;
+  justify-content: center;
+
+  margin-inline: 20px;
+
+  border-radius: 12px;
+  overflow: hidden;
+
+  background: #1A1A1A;
+  video {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.downloadsSidebar {
+  .title {
+    color: var(--text-secondary-2);
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 20px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .list {
+    >div {
+      display: flex;
+      align-items: center;
+
+      .githubIcon {
+        width: 24px;
+        height: 24px;
+        display: inline-block;
+        margin-right: 9px;
+        background-image: url( '../assets/icons/github.svg');
+        background-size: contain;
+      }
+
+      .githubIconLight {
+        width: 24px;
+        height: 24px;
+        display: inline-block;
+        margin-right: 9px;
+        background-image: url( '../assets/icons/github_light.svg');
+        background-size: contain;
+      }
+
+
+      >a {
+        color: var(--text-secondary-2);
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 40px;
+      }
+    }
+  }
+}
+
+.downloadsExtra {
+  display: none;
+}
+
+@media only screen and (max-width: 1087px) {
+  .downloadsExtra {
+    display: block;
+    width: 100%;
+    padding-left: 42px;
+    margin-bottom: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--subtile-devider);
+
+    .title {
+      color: var(--text-primary);
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 20px;
+      text-transform: capitalize;
+      margin-bottom: 20px;
+    }
+
+    .list {
+      >div {
+        display: flex;
+        align-items: center;
+
+        .githubIcon {
+          width: 24px;
+          height: 24px;
+          display: inline-block;
+          margin-right: 9px;
+          background-image: url( '../assets/icons/github.svg');
+          background-size: contain;
+        }
+
+        .githubIconLight {
+          width: 24px;
+          height: 24px;
+          display: inline-block;
+          margin-right: 9px;
+          background-image: url( '../assets/icons/github_light.svg');
+          background-size: contain;
+        }
+
+
+        >a {
+          color: var(--text-secondary-2);
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 40px;
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 720px) {
+
+  .appInfo {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .appInfoReverse {
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .promoVideo {
+    width: 100dvw;
+    border-radius: 0;
+    margin-inline: 0;
+  }
+
+  .downloadsExtra {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+
+    border: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    .sclabel {
+      color: var(--text-secondary-2);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 40px;
+    }
+  }
+
+  .promoVideo {
+    // width: 600px;
+    height: 210px;
+  }
+
+
+
+
+
+  .callToAction {
+    display: none;
+  }
+
+  .downloadsContent {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .promoHolder {
+    margin-bottom: 0;
+  }
+
+  .appInfo {
+
+    .appStore {
+      background-color: var(--background-site);
+
+      .desktopCTA {
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 24px;
+      }
+
+      .buidDetails {
+        font-size: 14px;
+        line-height: 14px;
+      }
+
+      >a {
+        text-align: center;
+        width: 198px;
+        height: 60px;
+        img {
+          width: 100%;
+        }
+      }
+    }
+
+    .playStore {
+      background-color: var(--background-site);
+
+      .desktopCTA {
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 24px;
+      }
+
+      .buidDetails {
+        font-size: 14px;
+        line-height: 14px;
+      }
+
+      >a {
+        text-align: center;
+        width: 198px;
+        height: 60px;
+        img {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .downloadsExtra {
+    /* margin-bottom: 80px; */
+  }
+}

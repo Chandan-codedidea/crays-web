@@ -1,0 +1,14 @@
+.modal {
+  background-color: var(--background-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.opaque {
+    background-color: var(--background-site);
+  }
+}
+
+.hidden {
+  display: none;
+}
