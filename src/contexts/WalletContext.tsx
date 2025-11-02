@@ -1,7 +1,7 @@
 import { createContext, useContext, createSignal, onMount, JSX } from 'solid-js';
-import type { WalletAdapter } from '../lib/wallet/types';
-import { BreezAdapter } from '../lib/wallet/adapters/BreezAdapter';
-import { LndAdapter } from '../lib/wallet/adapters/LndAdapter';
+import type { WalletAdapter } from '@/wallets/types';
+import { BreezAdapter } from '@/wallets/adapters/BreezAdapter';
+import { LndAdapter } from '@/wallets/adapters/LndAdapter';
 
 interface WalletState {
   initialized: boolean;
