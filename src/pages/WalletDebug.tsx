@@ -2,11 +2,16 @@ import { Component, createSignal, Show } from 'solid-js';
 import { BreezAdapter } from '../wallets/breez/breez.adapter';
 
 // Dev-only wallet debug interface
-if (import.meta.env.MODE === 'production') {
+if (!import.meta.env.DEV && import.meta.env.VITE_SHOW_WALLET_DEBUG !== 'true') {
   throw new Error('WalletDebug component should not be imported in production');
 }
 
 const WalletDebug: Component = () => {
+  // Guard: return null if neither dev mode nor debug flag is set
+  if (!import.meta.env.DEV && import.meta.env.VITE_SHOW_WALLET_DEBUG !== 'true') {
+    return null;
+  }
+
   const [breezAdapter] = createSignal(new BreezAdapter());
   const [result, setResult] = createSignal<string>('');
   const [balance, setBalance] = createSignal<string>('');
@@ -18,6 +23,7 @@ const WalletDebug: Component = () => {
     console.log('[WalletDebug] Initializing Breez...');
     setIsLoading(true);
     setResult('');
+
     try {
       await breezAdapter().initialize();
       const msg = 'Breez initialized successfully';
@@ -36,6 +42,7 @@ const WalletDebug: Component = () => {
     console.log('[WalletDebug] Fetching balance...');
     setIsLoading(true);
     setResult('');
+
     try {
       const balanceResult = await breezAdapter().getBalance();
       const msg = `Balance: ${JSON.stringify(balanceResult)}`;
@@ -55,6 +62,7 @@ const WalletDebug: Component = () => {
     console.log('[WalletDebug] Creating invoice...');
     setIsLoading(true);
     setResult('');
+
     try {
       // Create invoice for 1000 sats
       const invoiceResult = await breezAdapter().createInvoice(1000, 'Debug test invoice');
@@ -75,6 +83,7 @@ const WalletDebug: Component = () => {
     console.log('[WalletDebug] Paying invoice:', bolt11Input());
     setIsLoading(true);
     setResult('');
+
     try {
       const paymentResult = await breezAdapter().payInvoice(bolt11Input());
       const msg = `Payment successful: ${JSON.stringify(paymentResult)}`;
@@ -97,7 +106,9 @@ const WalletDebug: Component = () => {
       margin: '0 auto',
       'font-family': 'system-ui, -apple-system, sans-serif'
     }}>
-      <h1 style={{ 'border-bottom': '2px solid #333', 'padding-bottom': '10px' }}>
+      <h1 style={{
+        'margin-bottom': '20px'
+      }}>
         Wallet Debug Interface
       </h1>
       
@@ -111,7 +122,11 @@ const WalletDebug: Component = () => {
         ⚠️ Development Only - Not available in production
       </div>
 
-      <div style={{ display: 'flex', 'flex-direction': 'column', gap: '10px', 'margin-bottom': '20px' }}>
+      <div style={{
+        display: 'flex',
+        gap: '10px',
+        'margin-bottom': '20px'
+      }}>
         <button
           onClick={handleInitializeBreez}
           disabled={isLoading()}
@@ -161,11 +176,20 @@ const WalletDebug: Component = () => {
         </button>
       </div>
 
-      <div style={{ 'margin-bottom': '20px' }}>
-        <label style={{ display: 'block', 'margin-bottom': '5px', 'font-weight': 'bold' }}>
+      <div style={{
+        'margin-bottom': '20px'
+      }}>
+        <label style={{
+          display: 'block',
+          'margin-bottom': '8px',
+          'font-weight': 'bold'
+        }}>
           Pay Lightning Invoice:
         </label>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{
+          display: 'flex',
+          gap: '10px'
+        }}>
           <input
             type="text"
             placeholder="Paste bolt11 invoice here"
@@ -211,8 +235,10 @@ const WalletDebug: Component = () => {
       </Show>
 
       <Show when={balance()}>
-        <div style={{ 'margin-bottom': '20px' }}>
-          <h3>Current Balance:</h3>
+        <div style={{
+          'margin-bottom': '20px'
+        }}>
+          <strong>Current Balance:</strong>
           <div style={{
             padding: '15px',
             background: '#d4edda',
@@ -228,8 +254,10 @@ const WalletDebug: Component = () => {
       </Show>
 
       <Show when={invoice()}>
-        <div style={{ 'margin-bottom': '20px' }}>
-          <h3>Generated Invoice:</h3>
+        <div style={{
+          'margin-bottom': '20px'
+        }}>
+          <strong>Generated Invoice:</strong>
           <div style={{
             padding: '15px',
             background: '#d1ecf1',
@@ -246,8 +274,10 @@ const WalletDebug: Component = () => {
       </Show>
 
       <Show when={result()}>
-        <div style={{ 'margin-bottom': '20px' }}>
-          <h3>Result:</h3>
+        <div style={{
+          'margin-bottom': '20px'
+        }}>
+          <strong>Result:</strong>
           <div style={{
             padding: '15px',
             background: result().includes('Failed') ? '#f8d7da' : '#d4edda',
@@ -270,8 +300,11 @@ const WalletDebug: Component = () => {
         border: '1px solid #dee2e6',
         'border-radius': '4px'
       }}>
-        <h4>Console Output:</h4>
-        <p style={{ 'font-size': '12px', color: '#6c757d' }}>
+        <strong>Console Output:</strong>
+        <p style={{
+          'margin-top': '8px',
+          color: '#6c757d'
+        }}>
           All operations are logged to the browser console. Open DevTools to see detailed logs.
         </p>
       </div>
