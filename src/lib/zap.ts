@@ -58,7 +58,7 @@ export const zapOverNWC = async (pubkey: string, nwcEnc: string, invoice: string
   }
 };
 
-export const convertToZap = (zapContent: NostrUserZaps) => {
+export const convertNostrZapToPrimalZap = (zapContent: NostrUserZaps) => {
   const bolt11 = (zapContent.tags.find(t => t[0] === 'bolt11') || [])[1];
   const zapEvent = JSON.parse((zapContent.tags.find(t => t[0] === 'description') || [])[1] || '{}');
 
