@@ -7,6 +7,7 @@ interface WalletState {
   initialized: boolean;
   balance: number | null;
   error: string | null;
+  disabled: boolean;
 }
 
 interface Payment {
@@ -44,6 +45,7 @@ export function WalletProvider(props: { children: JSX.Element }) {
   const [initialized, setInitialized] = createSignal(false);
   const [balance, setBalance] = createSignal<number | null>(null);
   const [error, setError] = createSignal<string | null>(null);
+  const [disabled, setDisabled] = createSignal(false);
   
   let adapter: WalletAdapter | null = null;
 
@@ -54,6 +56,15 @@ export function WalletProvider(props: { children: JSX.Element }) {
       
       if (!walletProvider) {
         throw new Error('VITE_WALLET_PROVIDER environment variable is not set');
+      }
+
+      // Check if wallet is disabled
+      if (walletProvider.toLowerCase() === 'disabled') {
+        setDisabled(true);
+        setInitialized(true);
+        setBalance(0);
+        setError(null);
+        return;
       }
 
       // Instantiate adapter based on provider type
@@ -91,6 +102,11 @@ export function WalletProvider(props: { children: JSX.Element }) {
 
   const getBalance = async (): Promise<number> => {
     try {
+      // Return 0 if wallet is disabled
+      if (disabled()) {
+        return 0;
+      }
+
       if (!adapter) {
         throw new Error('Wallet adapter not initialized');
       }
@@ -108,6 +124,12 @@ export function WalletProvider(props: { children: JSX.Element }) {
 
   const createInvoice = async (params: CreateInvoiceParams): Promise<string> => {
     try {
+      // Return empty string if wallet is disabled
+      if (disabled()) {
+        console.warn('Wallet is disabled: createInvoice called but no-op');
+        return '';
+      }
+
       if (!adapter) {
         throw new Error('Wallet adapter not initialized');
       }
@@ -124,6 +146,12 @@ export function WalletProvider(props: { children: JSX.Element }) {
 
   const sendBolt11 = async (bolt11: string): Promise<string> => {
     try {
+      // Return failed status if wallet is disabled
+      if (disabled()) {
+        console.warn('Wallet is disabled: sendBolt11 called but no-op');
+        throw new Error('Wallet is disabled');
+      }
+
       if (!adapter) {
         throw new Error('Wallet adapter not initialized');
       }
@@ -144,6 +172,12 @@ export function WalletProvider(props: { children: JSX.Element }) {
 
   const payLnurlPay = async (params: PayLnurlPayParams): Promise<string> => {
     try {
+      // Return failed status if wallet is disabled
+      if (disabled()) {
+        console.warn('Wallet is disabled: payLnurlPay called but no-op');
+        throw new Error('Wallet is disabled');
+      }
+
       if (!adapter) {
         throw new Error('Wallet adapter not initialized');
       }
@@ -164,6 +198,11 @@ export function WalletProvider(props: { children: JSX.Element }) {
 
   const listPayments = async (): Promise<Payment[]> => {
     try {
+      // Return empty array if wallet is disabled
+      if (disabled()) {
+        return [];
+      }
+
       if (!adapter) {
         throw new Error('Wallet adapter not initialized');
       }
@@ -182,6 +221,7 @@ export function WalletProvider(props: { children: JSX.Element }) {
     initialized: initialized(),
     balance: balance(),
     error: error(),
+    disabled: disabled(),
   });
 
   const contextValue: WalletContextType = {
