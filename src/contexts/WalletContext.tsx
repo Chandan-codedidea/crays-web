@@ -3,6 +3,30 @@ import type { WalletAdapter } from '../wallets/adapters/WalletAdapter';
 import { BreezAdapter } from '../wallets/adapters/BreezAdapter';
 import { NwcAdapter } from '../wallets/adapters/NwcAdapter';
 
+type PayResult = { id: string; status: 'success' | 'failed'; preimage?: string };
+type PayLnurlResult = { id: string; status: 'success' | 'failed' };
+
+export interface CreateInvoiceParams {
+  amountMsat: number;
+  memo?: string;
+}
+
+export interface WalletApi {
+  init(): Promise<void>;
+  getBalance(): Promise<number>;
+  createInvoice(params: CreateInvoiceParams): Promise<string>; // bolt11
+  sendBolt11(pr: string): Promise<PayResult>;
+  payLnurlPay(
+    url: string,
+    amountMsat: number,
+    comment?: string,
+    zapRequestJson?: string
+  ): Promise<PayLnurlResult>;
+  listPayments(): Promise<any[]>;
+  onEvents(cb: (e: any) => void): void;
+  providerDisabled?: boolean;
+}
+
 interface WalletState {
   initialized: boolean;
   balance: number | null;
@@ -16,11 +40,6 @@ interface Payment {
   timestamp: number;
   type: 'incoming' | 'outgoing';
   status: 'pending' | 'completed' | 'failed';
-  description?: string;
-}
-
-interface CreateInvoiceParams {
-  amount: number;
   description?: string;
 }
 
@@ -204,7 +223,6 @@ export function WalletProvider(props: { children: JSX.Element }) {
     if (!adapter) {
       throw new Error('No wallet connected');
     }
-
     try {
       // Fetch LNURL-pay endpoint
       const lnurlDecoded = decodeLnurl(params.lnurlPay);
