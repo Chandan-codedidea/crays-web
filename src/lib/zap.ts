@@ -10,17 +10,21 @@ import { decodeNWCUri } from "./wallet";
 import { hexToBytes, parseBolt11 } from "../utils";
 import { convertToUser } from "../stores/profile";
 import { StreamingData } from "./streaming";
-
 // New imports per instructions
 import { useWalletContext } from "../contexts/WalletContext";
 import { logWalletPayment } from "../wallets/utils/wallet-logger";
 
 export let lastZapError: string = "";
 
+// Lightweight check used by NoteFooter
+export function canUserReceiveZaps(
+  meta?: { lud16?: string | null; lud06?: string | null }
+): boolean {
+  return Boolean(meta?.lud16 || meta?.lud06);
+}
+
 // ... keep other helper functions and existing logic intact ...
-
 // Payment executor replacements will be used in zap functions
-
 // Example structure of a shared executor if present originally
 async function payWithWallet(pr: string, sats: number) {
   const wallet = useWalletContext();
@@ -38,15 +42,12 @@ async function payWithWallet(pr: string, sats: number) {
 }
 
 // Below are stubs to show where replacements occur; existing zap logic remains unchanged apart from payment block
-
 export async function zapNote(/* existing params */) {
   // ... build zap request (9734), resolve LNURL, fetch invoice ...
   const pr = "" as unknown as string; // placeholder; in real code pr is obtained from LNURL callback
   const sats = 0 as unknown as number; // placeholder
-
   // REPLACED PAYMENT BLOCK
   await payWithWallet(pr, sats);
-
   // ... keep receipt logic and returns as-is
 }
 
