@@ -1,44 +1,54 @@
-import { subsTo } from '../sockets';
-export type ReceiptEvent = {
-  id: string;
-  pubkey: string;
-  created_at: number;
+import { subsTo } from './relays';
+
+type ReceiptEvent = {
   kind: number;
-  tags: string[][];
+  pubkey: string;
   content: string;
-  sig: string;
+  tags: string[][];
+  created_at: number;
 };
-export type ReceiptCallback = (event: ReceiptEvent) => void;
+
+type ReceiptCallback = (event: ReceiptEvent) => void;
+
 class ZapReceiptService {
-  private callback: ReceiptCallback | null = null;
+  private callbacks: Set<ReceiptCallback> = new Set();
   private unsubscribe: (() => void) | null = null;
-  start() {
+
+  start(publicKey: string, relays: string[]) {
     if (this.unsubscribe) {
       return;
     }
     this.unsubscribe = subsTo(
-      { kinds: [9735] },
+      'zap-receipts',
+      { kinds: [9735], '#p': [publicKey] },
       (event: ReceiptEvent) => {
-        if (this.callback) {
-          this.callback(event);
-        }
-      }
+        this.notifyCallbacks(event);
+      },
+      relays
     );
   }
+
   stop() {
     if (this.unsubscribe) {
       this.unsubscribe();
       this.unsubscribe = null;
     }
   }
-  onReceipt(callback: ReceiptCallback) {
-    this.callback = callback;
+
+  onReceipt(callback: ReceiptCallback): () => void {
+    this.callbacks.add(callback);
+    return () => {
+      this.callbacks.delete(callback);
+    };
+  }
+
+  private notifyCallbacks(event: ReceiptEvent) {
+    this.callbacks.forEach((callback) => {
+      callback(event);
+    });
   }
 }
-let instance: ZapReceiptService | null = null;
-export function getZapReceiptService(): ZapReceiptService {
-  if (!instance) {
-    instance = new ZapReceiptService();
-  }
-  return instance;
-}
+
+export const zapReceiptService = new ZapReceiptService();
+export { ZapReceiptService };
+export type { ReceiptEvent, ReceiptCallback };

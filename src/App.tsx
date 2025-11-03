@@ -16,7 +16,7 @@ import { AppProvider } from './contexts/AppContext';
 import { ReadsProvider } from './contexts/ReadsContext';
 import { AdvancedSearchProvider } from './contexts/AdvancedSearchContext';
 import { DMProvider } from './contexts/DMContext';
-import { useZapReceipts } from './hooks/useZapReceipts';
+import WalletFab from './components/WalletFab';
 import 'media-chrome';
 import "media-chrome/media-theme-element";
 import 'hls-video-element';
@@ -38,8 +38,6 @@ const App: Component = () => {
   onCleanup(() => {
     disconnect();
   });
-
-  useZapReceipts();
 
   return (
     <AppProvider>
@@ -72,6 +70,7 @@ const App: Component = () => {
           </MediaProvider>
         </Toaster>
       </TranslatorProvider>
+      {import.meta.env.VITE_SHOW_WALLET_ENTRY === 'true' ? <WalletFab /> : null}
     </AppProvider>
   );
 };
