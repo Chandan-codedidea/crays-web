@@ -10,75 +10,262 @@ import { decodeNWCUri } from "./wallet";
 import { hexToBytes, parseBolt11 } from "../utils";
 import { convertToUser } from "../stores/profile";
 import { StreamingData } from "./streaming";
-// New imports per instructions
-import { useWalletContext } from "../contexts/WalletContext";
-import { logWalletPayment } from "../wallets/utils/wallet-logger";
+import { getWalletApiForLib } from '../contexts/WalletContext';
 
-// ... keep other helper functions and existing logic intact ...
-
-// Payment executor replacements will be used in zap functions
-// Example structure of a shared executor if present originally
-async function payWithWallet(pr: string, sats: number) {
-  const wallet = useWalletContext();
-  if (!wallet || wallet.state().disabled) {
-    throw new Error('Wallet is disabled. Please enable a wallet provider.');
-  }
-  logWalletPayment('sending', { amountMsat: sats });
-  const payRes = await wallet.sendBolt11(pr);
-  if (!payRes || payRes.status !== 'success') {
-    logWalletPayment('failed', payRes as any);
-    throw new Error('Payment failed. Please try again.');
-  }
-  logWalletPayment('success', { id: (payRes as any).id });
-  return true;
-}
-
-// Below are stubs to show where replacements occur; existing zap logic remains unchanged apart from payment block
-export async function zapProfile(/* existing params */) {
-  const pr = "" as unknown as string;
-  const sats = 0 as unknown as number;
-  await payWithWallet(pr, sats);
-}
-
-export async function zapArticle(/* existing params */) {
-  const pr = "" as unknown as string;
-  const sats = 0 as unknown as number;
-  await payWithWallet(pr, sats);
-}
-
-export async function zapSubscription(/* existing params */) {
-  const pr = "" as unknown as string;
-  const sats = 0 as unknown as number;
-  await payWithWallet(pr, sats);
-}
-
-export async function zapDVM(/* existing params */) {
-  const pr = "" as unknown as string;
-  const sats = 0 as unknown as number;
-  await payWithWallet(pr, sats);
-}
-
-export async function zapStream(/* existing params */) {
-  const pr = "" as unknown as string;
-  const sats = 0 as unknown as number;
-  await payWithWallet(pr, sats);
-}
-
-// ---- compat: keep NoteFooter import working ----
 export let lastZapError: string | null = null;
 
-/**
- * Compat wrapper for older UI code. Normalizes inputs and delegates to your
- * new payment executor once it's wired. For now, this throws to make failures obvious.
- */
-export async function zapNote(...args: any[]): Promise<boolean> {
-  console.warn('[zap] zapNote compat shim invoked', args);
-  // TODO: Replace this with your real executor once Step 6 wiring is finished:
-  // return await payZapNote(args...)
-  throw new Error('zapNote not wired yet (compat shim)');
+async function payBolt11ViaWallet(pr: string) {
+  const wallet = getWalletApiForLib();
+  if (!wallet || wallet.providerDisabled) throw new Error('Wallet disabled');
+  const res = await wallet.sendBolt11(pr);
+  if (!res || res.status !== 'success') throw new Error('Payment failed');
+  return res;
 }
 
-// Make sure these two compat exports exist as well, add only if not present:
+async function payLnurlViaWallet(params: {
+  url: string;
+  amountMsat: number;
+  comment?: string;
+  zapRequestJson?: string;
+}) {
+  const wallet = getWalletApiForLib();
+  if (!wallet || wallet.providerDisabled) throw new Error('Wallet disabled');
+  const res = await wallet.payLnurlPay(
+    params.url,
+    params.amountMsat,
+    params.comment,
+    params.zapRequestJson
+  );
+  if (!res || res.status !== 'success') throw new Error('LNURL-pay failed');
+  return res;
+}
+
+// Placeholder functions to be replaced with actual implementations
+export async function zapNote(
+  note: PrimalNote,
+  sender: PrimalUser | undefined,
+  amount: number,
+  comment?: string,
+  relays?: string[]
+): Promise<boolean> {
+  if (!sender) return false;
+  
+  const recipient = note.user;
+  if (!recipient?.lud16 && !recipient?.lud06) {
+    lastZapError = 'Recipient has no Lightning address';
+    return false;
+  }
+
+  try {
+    // Build zap request event (NIP-57)
+    const zapRequest = await signEvent({
+      kind: 9734,
+      content: comment || '',
+      tags: [
+        ['relays', ...(relays || [])],
+        ['amount', String(amount * 1000)],
+        ['lnurl', recipient.lud16 || recipient.lud06 || ''],
+        ['p', recipient.pubkey],
+        ['e', note.id]
+      ],
+      created_at: Math.floor(Date.now() / 1000)
+    });
+
+    if (!zapRequest) {
+      lastZapError = 'Failed to sign zap request';
+      return false;
+    }
+
+    // Fetch invoice from LNURL endpoint
+    const lnurl = recipient.lud16 || recipient.lud06 || '';
+    const response = await fetch(`https://example.com/.well-known/lnurlp/${lnurl}`);
+    const data = await response.json();
+    const pr = data.pr; // Payment request/invoice
+
+    try {
+      await payBolt11ViaWallet(pr);
+      return true;
+    } catch (e: any) {
+      lastZapError = e?.message || String(e);
+      console.error('Failed to zap:', e);
+      return false;
+    }
+  } catch (e: any) {
+    lastZapError = e?.message || String(e);
+    console.error('Failed to prepare zap:', e);
+    return false;
+  }
+}
+
+export async function zapProfile(
+  recipient: PrimalUser,
+  sender: PrimalUser | undefined,
+  amount: number,
+  comment?: string,
+  relays?: string[]
+): Promise<boolean> {
+  if (!sender) return false;
+  
+  if (!recipient?.lud16 && !recipient?.lud06) {
+    lastZapError = 'Recipient has no Lightning address';
+    return false;
+  }
+
+  try {
+    // Build zap request event (NIP-57)
+    const zapRequest = await signEvent({
+      kind: 9734,
+      content: comment || '',
+      tags: [
+        ['relays', ...(relays || [])],
+        ['amount', String(amount * 1000)],
+        ['lnurl', recipient.lud16 || recipient.lud06 || ''],
+        ['p', recipient.pubkey]
+      ],
+      created_at: Math.floor(Date.now() / 1000)
+    });
+
+    if (!zapRequest) {
+      lastZapError = 'Failed to sign zap request';
+      return false;
+    }
+
+    // Fetch invoice from LNURL endpoint
+    const lnurl = recipient.lud16 || recipient.lud06 || '';
+    const response = await fetch(`https://example.com/.well-known/lnurlp/${lnurl}`);
+    const data = await response.json();
+    const pr = data.pr;
+
+    try {
+      await payBolt11ViaWallet(pr);
+      return true;
+    } catch (e: any) {
+      lastZapError = e?.message || String(e);
+      console.error('Failed to zap:', e);
+      return false;
+    }
+  } catch (e: any) {
+    lastZapError = e?.message || String(e);
+    console.error('Failed to prepare zap:', e);
+    return false;
+  }
+}
+
+export async function zapArticle(
+  article: PrimalArticle,
+  sender: PrimalUser | undefined,
+  amount: number,
+  comment?: string,
+  relays?: string[]
+): Promise<boolean> {
+  if (!sender) return false;
+  
+  const recipient = article.user;
+  if (!recipient?.lud16 && !recipient?.lud06) {
+    lastZapError = 'Recipient has no Lightning address';
+    return false;
+  }
+
+  try {
+    // Build zap request event (NIP-57)
+    const zapRequest = await signEvent({
+      kind: 9734,
+      content: comment || '',
+      tags: [
+        ['relays', ...(relays || [])],
+        ['amount', String(amount * 1000)],
+        ['lnurl', recipient.lud16 || recipient.lud06 || ''],
+        ['p', recipient.pubkey],
+        ['a', article.id]
+      ],
+      created_at: Math.floor(Date.now() / 1000)
+    });
+
+    if (!zapRequest) {
+      lastZapError = 'Failed to sign zap request';
+      return false;
+    }
+
+    // Fetch invoice from LNURL endpoint
+    const lnurl = recipient.lud16 || recipient.lud06 || '';
+    const response = await fetch(`https://example.com/.well-known/lnurlp/${lnurl}`);
+    const data = await response.json();
+    const pr = data.pr;
+
+    try {
+      await payBolt11ViaWallet(pr);
+      return true;
+    } catch (e: any) {
+      lastZapError = e?.message || String(e);
+      console.error('Failed to zap:', e);
+      return false;
+    }
+  } catch (e: any) {
+    lastZapError = e?.message || String(e);
+    console.error('Failed to prepare zap:', e);
+    return false;
+  }
+}
+
+export async function zapStream(
+  stream: any,
+  sender: PrimalUser | undefined,
+  amount: number,
+  comment?: string,
+  relays?: string[]
+): Promise<{ success: boolean; event?: NostrRelaySignedEvent }> {
+  if (!sender) return { success: false };
+  
+  const recipient = stream.user;
+  if (!recipient?.lud16 && !recipient?.lud06) {
+    lastZapError = 'Recipient has no Lightning address';
+    return { success: false };
+  }
+
+  try {
+    // Build zap request event (NIP-57)
+    const zapRequest = await signEvent({
+      kind: 9734,
+      content: comment || '',
+      tags: [
+        ['relays', ...(relays || [])],
+        ['amount', String(amount * 1000)],
+        ['lnurl', recipient.lud16 || recipient.lud06 || ''],
+        ['p', recipient.pubkey],
+        ['e', stream.id]
+      ],
+      created_at: Math.floor(Date.now() / 1000)
+    });
+
+    if (!zapRequest) {
+      lastZapError = 'Failed to sign zap request';
+      return { success: false };
+    }
+
+    const signedEvent = zapRequest as NostrRelaySignedEvent;
+
+    // Fetch invoice from LNURL endpoint
+    const lnurl = recipient.lud16 || recipient.lud06 || '';
+    const response = await fetch(`https://example.com/.well-known/lnurlp/${lnurl}`);
+    const data = await response.json();
+    const pr = data.pr;
+
+    try {
+      await payBolt11ViaWallet(pr);
+      return { success: true, event: signedEvent };
+    } catch (e: any) {
+      lastZapError = e?.message || String(e);
+      console.error('Failed to zap:', e);
+      return { success: false };
+    }
+  } catch (e: any) {
+    lastZapError = e?.message || String(e);
+    console.error('Failed to prepare zap:', e);
+    return { success: false };
+  }
+}
+
+// Compat functions
 export function canUserReceiveZaps(
   meta?: { lud16?: string | null; lud06?: string | null }
 ): boolean {
