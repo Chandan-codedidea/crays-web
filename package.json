@@ -24,6 +24,7 @@
     "vite-plugin-solid": "2.7.0"
   },
   "dependencies": {
+    "@breeztech/breez-sdk-spark": "*",
     "@cashu/cashu-ts": "0.9.0",
     "@cookbook/solid-intl": "0.1.2",
     "@jukben/emoji-search": "3.0.0",
