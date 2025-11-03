@@ -47,12 +47,13 @@ export class BreezAdapter implements WalletAdapter {
     return await BreezService.createInvoice(amountMsat, memo);
   }
 
-  async sendBolt11(invoice: string): Promise<{ id: string; status: 'success' | 'failed'; preimage?: string }> {
+async sendBolt11(invoice: string): Promise<{ id: string; status: 'success' | 'failed'; preimage?: string; txId?: string }> {
     const result = await BreezService.payInvoice(invoice);
     return { 
       id: result.id, 
       status: result.status === 'complete' ? 'success' : 'failed',
-      preimage: result.paymentHash 
+      preimage: result.paymentHash,
+      txId: result.id
     };
   }
 
