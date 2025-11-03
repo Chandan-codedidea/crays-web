@@ -14,11 +14,16 @@ export default function WalletFab() {
 
   const wallet = () => getWalletApiForLib();
 
+  const providerDisabled = () => Boolean((wallet() as any)?.providerDisabled);
+  const providerName = import.meta.env.VITE_WALLET_PROVIDER || 'breez';
+  const network = import.meta.env.VITE_BREEZ_NETWORK || 'testnet';
+  const hasApiKey = Boolean(import.meta.env.VITE_BREEZ_API_KEY);
+
   async function doInit() {
     try {
-      setStatus('Initializing...');
+      setStatus('Initializing wallet...');
       await wallet()?.init?.();
-      setStatus('Initialized ✅');
+      setStatus('Wallet created/loaded ✅');
     } catch (e:any) {
       setStatus(`Init error: ${e?.message || e}`);
     }
@@ -61,24 +66,22 @@ export default function WalletFab() {
     }
   }
 
-  const fabStyle = {
-    position: 'fixed', right: '16px', bottom: '16px', zIndex: 9999,
-    background: '#111', color: '#fff', borderRadius: '999px', padding: '10px 14px',
-    fontSize: '14px', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-  } as any;
-
+  const fabStyle: any = {
+    position: 'fixed', bottom: '20px', right: '20px', background: '#5865f2', color: '#fff',
+    border: 'none', borderRadius: '50px', padding: '12px 20px', fontSize: '16px',
+    cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', zIndex: 9999
+  };
   const modalWrap: any = {
-    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex',
+    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex',
     alignItems: 'center', justifyContent: 'center', zIndex: 10000
   };
   const modal: any = {
     width: 'min(92vw, 520px)', background: '#181818', color: '#fff', borderRadius: '12px',
     padding: '16px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)'
   };
-  const row: any = { display: 'flex', gap: '8px', margin: '8px 0', alignItems: 'center' };
-  const input: any = { flex: 1, background: '#222', color: '#fff', border: '1px solid #333',
-    borderRadius: '8px', padding: '8px' };
-  const btn: any = { background: '#2d68ff', border: 'none', color: '#fff', borderRadius: '8px', padding: '8px 10px', cursor: 'pointer' };
+  const row: any = { display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' };
+  const btn: any = { padding: '8px 16px', borderRadius: '6px', border: 'none', background: '#5865f2', color: '#fff', cursor: 'pointer' };
+  const input: any = { flex: 1, padding: '8px', borderRadius: '6px', border: '1px solid #3a3a3a', background: '#2a2a2a', color: '#fff' };
 
   return (
     <>
@@ -88,31 +91,51 @@ export default function WalletFab() {
       <Show when={open()}>
         <div style={modalWrap} onClick={() => setOpen(false)}>
           <div style={modal} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <strong>Wallet (Testnet)</strong>
+            <div style={{ display: 'flex', 'justify-content': 'space-between', 'margin-bottom': '8px' }}>
+              <strong>Wallet (Provider: {providerName}, Net: {network})</strong>
               <button style={{ ...btn, background: '#444' }} onClick={() => setOpen(false)}>Close</button>
             </div>
 
+            {/* Diagnostics if wallet provider missing or disabled */}
+            {!wallet() || providerDisabled() ? (
+              <div style={{ background:'#2a2a2a', border:'1px solid #3a3a3a', padding:'10px', borderRadius:'8px', 'margin-bottom':'10px' }}>
+                <div style={{ 'font-weight':'bold', 'margin-bottom':'6px' }}>Diagnostics</div>
+                <div>Wallet API available: {String(!!wallet())}</div>
+                <div>Provider disabled: {String(providerDisabled())}</div>
+                <div>Breez API key set: {String(hasApiKey)}</div>
+                <div style={{ 'margin-top':'6px', 'font-size':'12px', color:'#9aa0a6' }}>
+                  Ensure <code>VITE_WALLET_PROVIDER=breez</code>, <code>VITE_BREEZ_NETWORK=testnet</code>, and <code>VITE_BREEZ_API_KEY</code> are set. Then click <strong>Create Wallet (Init)</strong>.
+                </div>
+              </div>
+            ) : null}
+
+            {/* Primary: Create/Load Wallet */}
+            <div style={{ 'margin-bottom':'8px' }}><strong>Create / Load</strong></div>
             <div style={row}>
-              <button style={btn} onClick={doInit}>Initialize</button>
+              <button style={{ ...btn, background:'#00c853' }} onClick={doInit}>Create Wallet (Init)</button>
+            </div>
+
+            {/* Secondary: Balance */}
+            <div style={{ 'margin-top':'12px', 'margin-bottom':'4px' }}><strong>Balance</strong></div>
+            <div style={row}>
               <button style={btn} onClick={doBalance}>Get Balance</button>
               <span>{balance() !== null ? `${balance()} sats` : ''}</span>
             </div>
 
-            <div style={{ marginTop: '8px', marginBottom: '4px' }}><strong>Create Invoice</strong></div>
+            <div style={{ 'margin-top': '8px', 'margin-bottom': '4px' }}><strong>Create Invoice</strong></div>
             <div style={row}>
               <input style={input} type="number" min="1" value={amountSats()} onInput={(e:any)=>setAmountSats(e.currentTarget.value)} placeholder="Amount (sats)" />
               <button style={btn} onClick={doCreateInvoice}>Create</button>
             </div>
-            <div style={{ ...input, padding: '8px', marginBottom: '8px' }}>{invoice() || '—'}</div>
+            <div style={{ ...input, padding: '8px', 'margin-bottom': '8px' }}>{invoice() || '—'}</div>
 
-            <div style={{ marginTop: '8px', marginBottom: '4px' }}><strong>Pay Invoice</strong></div>
+            <div style={{ 'margin-top': '8px', 'margin-bottom': '4px' }}><strong>Pay Invoice</strong></div>
             <div style={row}>
               <input style={input} value={payPr()} onInput={(e:any)=>setPayPr(e.currentTarget.value)} placeholder="Paste BOLT11" />
               <button style={btn} onClick={doPay}>Pay</button>
             </div>
 
-            <div style={{ marginTop: '10px', color: '#9aa0a6', fontSize: '12px' }}>{status()}</div>
+            <div style={{ 'margin-top': '10px', color: '#9aa0a6', 'font-size': '12px' }}>{status()}</div>
           </div>
         </div>
       </Show>
