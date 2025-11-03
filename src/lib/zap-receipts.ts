@@ -1,5 +1,4 @@
-import { subsTo } from './sockets';
-
+import { subsTo } from '../sockets';
 export type ReceiptEvent = {
   id: string;
   pubkey: string;
@@ -9,18 +8,14 @@ export type ReceiptEvent = {
   content: string;
   sig: string;
 };
-
 export type ReceiptCallback = (event: ReceiptEvent) => void;
-
 class ZapReceiptService {
   private callback: ReceiptCallback | null = null;
   private unsubscribe: (() => void) | null = null;
-
   start() {
     if (this.unsubscribe) {
       return;
     }
-
     this.unsubscribe = subsTo(
       { kinds: [9735] },
       (event: ReceiptEvent) => {
@@ -30,21 +25,17 @@ class ZapReceiptService {
       }
     );
   }
-
   stop() {
     if (this.unsubscribe) {
       this.unsubscribe();
       this.unsubscribe = null;
     }
   }
-
   onReceipt(callback: ReceiptCallback) {
     this.callback = callback;
   }
 }
-
 let instance: ZapReceiptService | null = null;
-
 export function getZapReceiptService(): ZapReceiptService {
   if (!instance) {
     instance = new ZapReceiptService();
