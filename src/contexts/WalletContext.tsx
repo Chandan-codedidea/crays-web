@@ -3,7 +3,7 @@ import type { WalletAdapter } from '../wallets/adapters/WalletAdapter';
 import { BreezAdapter } from '../wallets/adapters/BreezAdapter';
 import { NwcAdapter } from '../wallets/adapters/NwcAdapter';
 
-type PayResult = { id: string; status: 'success' | 'failed'; preimage?: string };
+type PayResult = { id: string; status: 'success' | 'failed'; preimage?: string; txId?: string };
 type PayLnurlResult = { id: string; status: 'success' | 'failed' };
 
 export interface CreateInvoiceParams {

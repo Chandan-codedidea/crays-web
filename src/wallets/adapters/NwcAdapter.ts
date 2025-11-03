@@ -32,7 +32,7 @@ export class NwcAdapter implements WalletAdapter {
     throw new Error('NwcAdapter not implemented yet');
   }
 
-  async sendBolt11(invoice: string): Promise<{ id: string; status: 'success' | 'failed'; preimage?: string }> {
+async sendBolt11(invoice: string): Promise<{ id: string; status: 'success' | 'failed'; preimage?: string; txId?: string }> {
     // TODO: Implement NWC send bolt11
     throw new Error('NwcAdapter not implemented yet');
   }
