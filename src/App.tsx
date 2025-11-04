@@ -16,6 +16,7 @@ import { AppProvider } from './contexts/AppContext';
 import { ReadsProvider } from './contexts/ReadsContext';
 import { AdvancedSearchProvider } from './contexts/AdvancedSearchContext';
 import { DMProvider } from './contexts/DMContext';
+import { WalletProvider } from './contexts/WalletContext';
 import WalletFab from './components/WalletFab';
 import 'media-chrome';
 import "media-chrome/media-theme-element";
@@ -44,33 +45,35 @@ const App: Component = () => {
       <TranslatorProvider>
         <Toaster>
           <MediaProvider>
-            <AccountProvider>
-              <SearchProvider>
-                <AdvancedSearchProvider>
-                  <SettingsProvider>
-                    <ProfileProvider>
-                      <DMProvider>
-                        <NotificationsProvider>
-                          <ReadsProvider>
-                            <HomeProvider>
-                              <ExploreProvider>
-                                <ThreadProvider>
-                                  <AppRouter />
-                                </ThreadProvider>
-                              </ExploreProvider>
-                            </HomeProvider>
-                          </ReadsProvider>
-                        </NotificationsProvider>
-                      </DMProvider>
-                    </ProfileProvider>
-                  </SettingsProvider>
-                </AdvancedSearchProvider>
-              </SearchProvider>
-            </AccountProvider>
+            <WalletProvider>
+              <AccountProvider>
+                <SearchProvider>
+                  <AdvancedSearchProvider>
+                    <SettingsProvider>
+                      <ProfileProvider>
+                        <DMProvider>
+                          <NotificationsProvider>
+                            <ReadsProvider>
+                              <HomeProvider>
+                                <ExploreProvider>
+                                  <ThreadProvider>
+                                    <AppRouter/>
+                                  </ThreadProvider>
+                                </ExploreProvider>
+                              </HomeProvider>
+                            </ReadsProvider>
+                          </NotificationsProvider>
+                        </DMProvider>
+                      </ProfileProvider>
+                    </SettingsProvider>
+                  </AdvancedSearchProvider>
+                </SearchProvider>
+              </AccountProvider>
+            </WalletProvider>
           </MediaProvider>
         </Toaster>
       </TranslatorProvider>
-      {import.meta.env.VITE_SHOW_WALLET_ENTRY === 'true' ? <WalletFab /> : null}
+      {import.meta.env.VITE_SHOW_WALLET_ENTRY === 'true' ? <WalletFab/> : null}
     </AppProvider>
   );
 };
