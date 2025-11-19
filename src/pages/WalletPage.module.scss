@@ -1,0 +1,158 @@
+.walletContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+}
+
+.onboardingWrapper {
+  max-width: 800px;
+  margin: 3rem auto 0;
+}
+
+.heroSection {
+  text-align: center;
+  margin-bottom: 3rem;
+  
+  .iconWrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    
+    .walletIcon {
+      width: 40px;
+      height: 40px;
+      color: white;
+    }
+  }
+  
+  .heroTitle {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 1rem;
+  }
+  
+  .heroDescription {
+    font-size: 1.125rem;
+    color: #4a5568;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+.actionCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.actionCard {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover {
+    border-color: #667eea;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(102, 126, 234, 0.15);
+    
+    &::before {
+      transform: scaleY(1);
+    }
+    
+    .cardArrow {
+      transform: translateX(4px);
+    }
+  }
+  
+  .cardIcon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    
+    svg {
+      width: 24px;
+      height: 24px;
+      color: #667eea;
+    }
+  }
+  
+  .cardTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 0.5rem;
+  }
+  
+  .cardDescription {
+    font-size: 0.95rem;
+    color: #718096;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+  
+  .cardArrow {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    font-size: 1.5rem;
+    color: #667eea;
+    transition: transform 0.3s ease;
+  }
+}
+
+.securityNote {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .shieldIcon {
+    width: 32px;
+    height: 32px;
+    color: #48bb78;
+    flex-shrink: 0;
+  }
+  
+  p {
+    font-size: 0.95rem;
+    color: #4a5568;
+    margin: 0;
+  }
+}
