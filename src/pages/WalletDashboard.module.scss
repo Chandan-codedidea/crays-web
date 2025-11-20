@@ -1,0 +1,769 @@
+.dashboardContainer {
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  
+  .title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: black;
+    margin: 0;
+  }
+  
+  .logoutButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: black;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: white;
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  p {
+    margin-top: 1rem;
+    font-size: 1.125rem;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorContainer {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  
+  p {
+    color: #e53e3e;
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+  }
+  
+  button {
+    padding: 0.75rem 2rem;
+    background: #667eea;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.balanceCard {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2rem;
+  text-align: center;
+  
+  .balanceLabel {
+    font-size: 1rem;
+    color: #718096;
+    margin: 0 0 0.5rem 0;
+    font-weight: 500;
+  }
+  
+  .balanceAmount {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 2rem 0;
+    
+    span {
+      font-size: 1.5rem;
+      color: #718096;
+      font-weight: 500;
+    }
+  }
+  
+  .balanceActions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    
+    .actionButton {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.4rem 2rem;
+      background: linear-gradient(135deg, #f31249 0%, #f31249 100%);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 1.125rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+      
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      }
+      
+      &:active {
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+.transactionsSection {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  
+  .sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    
+    h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin: 0;
+    }
+    
+    .refreshButton {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      color: #4a5568;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+      
+      &:hover:not(:disabled) {
+        background: #edf2f7;
+        border-color: #cbd5e0;
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+  
+  .emptyState {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #a0aec0;
+    
+    p {
+      font-size: 1.125rem;
+      margin: 0;
+    }
+  }
+  
+  .transactionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    
+    .transactionItem {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: #edf2f7;
+        border-color: #cbd5e0;
+        transform: translateX(5px);
+      }
+      
+      .transactionIcon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border-radius: 12px;
+        flex-shrink: 0;
+        
+        svg {
+          width: 24px;
+          height: 24px;
+          fill: #667eea;
+        }
+      }
+      
+      .transactionDetails {
+        flex: 1;
+        
+        .transactionType {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #1a202c;
+          margin: 0 0 0.25rem 0;
+        }
+        
+        .transactionDate {
+          font-size: 0.875rem;
+          color: #718096;
+          margin: 0;
+        }
+      }
+      
+      .transactionAmount {
+        font-size: 1.125rem;
+        font-weight: 700;
+        
+        .positive {
+          color: #48bb78;
+        }
+        
+        .negative {
+          color: #e53e3e;
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .dashboardContainer {
+    padding: 1rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    
+    .title {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .balanceCard {
+    padding: 1.5rem;
+    
+    .balanceAmount {
+      font-size: 2.5rem;
+    }
+    
+    .balanceActions {
+      flex-direction: column;
+      
+      .actionButton {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+  
+  .transactionsSection {
+    padding: 1.5rem;
+    
+    .sectionHeader {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      
+      .refreshButton {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+
+
+// Modal Overlay
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// Bottom Sheet Modal
+.modalSheet {
+  background: white;
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modalHandle {
+  width: 40px;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  margin: 0 auto 1rem;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0;
+  }
+  
+  .closeButton {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f7fafc;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: #edf2f7;
+      color: #1a202c;
+    }
+  }
+}
+
+// Tab Buttons
+.tabButtons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: #f7fafc;
+  padding: 0.25rem;
+  border-radius: 12px;
+}
+
+.tab,
+.tabActive {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: #718096;
+  
+  &:hover {
+    color: #4a5568;
+  }
+}
+
+.tabActive {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+// Loading State
+.loadingAddresses {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  p {
+    margin-top: 1rem;
+    color: #718096;
+    font-size: 0.9rem;
+  }
+}
+
+// Address Section
+.modalContent {
+  .addressSection {
+    .addressDescription {
+      font-size: 0.9rem;
+      color: #718096;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    
+    .addressBox {
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      
+      .address {
+        display: block;
+        font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+        font-size: 0.95rem;
+        color: #2d3748;
+        word-break: break-all;
+        text-align: center;
+        line-height: 1.6;
+      }
+    }
+    
+    .copyButton {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.5rem 1.5rem;
+      background: linear-gradient(135deg, #f31249 0%, #f31249 100%);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+// Mobile Responsive
+@media (max-width: 768px) {
+  .modalSheet {
+    max-height: 90vh;
+    border-radius: 20px 20px 0 0;
+  }
+  
+  .modalHeader {
+    h2 {
+      font-size: 1.25rem;
+    }
+  }
+  
+  .addressBox {
+    .address {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// Desktop - Center Modal
+@media (min-width: 769px) {
+  .modalOverlay {
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modalSheet {
+    border-radius: 20px;
+    max-height: 600px;
+    animation: scaleIn 0.3s ease;
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+
+.infoMessage {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #fef5e7;
+  border: 2px solid #f9e79f;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: #f39c12;
+    flex-shrink: 0;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #7d6608;
+  }
+}
+
+
+.qrContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  
+  .qrCode {
+    width: 200px;
+    height: 200px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+}
+
+@media (max-width: 768px) {
+  .qrContainer {
+    .qrCode {
+      width: 180px;
+      height: 180px;
+    }
+  }
+}
+
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  background: #f7fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  
+  .input {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    outline: none;
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  .inputSuffix {
+    padding: 1rem;
+    color: #718096;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+}
+
+.errorText {
+  color: #e53e3e;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.suggestions {
+  margin: 1rem 0;
+  
+  .suggestionsLabel {
+    font-size: 0.9rem;
+    color: #718096;
+    margin-bottom: 0.5rem;
+  }
+  
+  .suggestionsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .suggestionChip {
+    padding: 0.5rem 1rem;
+    background: #edf2f7;
+    border: 1px solid #cbd5e0;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #4a5568;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &:hover {
+      background: #e2e8f0;
+      border-color: #667eea;
+      color: #667eea;
+    }
+  }
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.secondaryButton {
+  flex: 1;
+  padding: 1rem;
+  background: transparent;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  color: #4a5568;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover:not(:disabled) {
+    background: #f7fafc;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.editIconButton {
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: transform 0.2s;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+}
