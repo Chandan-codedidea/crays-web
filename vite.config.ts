@@ -2,8 +2,6 @@ import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import packageJson from './package.json';
 import { VitePWA } from 'vite-plugin-pwa';
-
-
 export default defineConfig({
   plugins: [
     solidPlugin(),
@@ -31,7 +29,7 @@ export default defineConfig({
     sourcemap: true,
     manifest: true,
   },
-  envPrefix: 'PRIMAL_',
+  envPrefix: ['PRIMAL_', 'VITE_'],
   define: {
     'import.meta.env.PRIMAL_VERSION': JSON.stringify(packageJson.version),
   },
