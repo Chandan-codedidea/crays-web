@@ -73,8 +73,6 @@ import ProfileCardSkeleton from "../components/Skeleton/ProfileCardSkeleton";
 import PremiumCohortInfo from "./Premium/PremiumCohortInfo";
 import { ProfilePointer } from "nostr-tools/lib/types/nip19";
 
-import { getSocialLinks } from "../components/SocialIcon/socialLinks";
-import { SocialIcon } from "../components/SocialIcon/SocialIcon";
 
 const ProfileDesktop: Component = () => {
   const settings = useSettingsContext();
@@ -1156,21 +1154,7 @@ const ProfileDesktop: Component = () => {
                           </a>
                         </Show>
                       </div>
-                     
-                      <div class="profile-social-links">
-                        <For each={getSocialLinks(profile?.userProfile)}>
-                          {(link) => (
-                            <a
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="profile-social-icon"
-                            >
-                              <SocialIcon platform={link.platform} />
-                            </a>
-                          )}
-                        </For>
-                      </div>
+                  
                       <Show when={commonFollowers().length > 0}>
                         <div class={styles.commonFollows}>
                           <div class={styles.label}>Followed by</div>
