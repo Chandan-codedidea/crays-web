@@ -58,18 +58,14 @@ const Imprint: Component = () => {
                         United Arab Emirates
                     </p>
                     <p>
-                        — Kai Thorben biesenbach
-                        E-Mail: info@crays.org
+                        — Kai Thorben biesenbach <br />
+                        E-Mail: tb@crays.org
                     </p>
                 </section>
             </div>
 
             <footer class={styles.footer}>
-                <div class={styles.footerLinks}>
-                    <A href="/terms">Terms of Service</A>
-                    <A href="/privacy">Privacy Policy</A>
-                    <A href="/legal/imprint">Imprint</A>
-                </div>
+
                 <div class={styles.copyright}>
                     &copy; {new Date().getFullYear()} Crays. All rights reserved.
                 </div>
