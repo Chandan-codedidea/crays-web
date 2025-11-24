@@ -33,7 +33,7 @@ const Menu: Component = () => {
           </A>
         </Show>
 
-    
+
         <A href="/settings/home_feeds">
           {intl.formatMessage(t.homeFeeds.title)}
           <div class={styles.chevron}></div>
@@ -81,6 +81,11 @@ const Menu: Component = () => {
             <div class={styles.chevron}></div>
           </A>
         </Show>
+
+        <A href="/legal/imprint">
+          Imprint
+          <div class={styles.chevron}></div>
+        </A>
       </div>
 
       <Show when={account?.sec}>
