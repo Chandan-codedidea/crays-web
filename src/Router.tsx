@@ -33,6 +33,7 @@ const Help = lazy(() => import("./pages/Help"));
 const Search = lazy(() => import("./pages/Search"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const EditProfile = lazy(() => import("./pages/EditProfile"));
+const ProfileLinksPage = lazy(() => import("./pages/ProfileLinksPage")); 
 const Profile = lazy(() => import("./pages/Profile"));
 const Mutelist = lazy(() => import("./pages/Mutelist"));
 const CreateAccount = lazy(() => import("./pages/CreateAccount"));
@@ -117,12 +118,12 @@ const AppRouter: Component = () => {
       nip19,
     };
 
-    primalWindow.onPrimalComponentMount = () => { };
-    primalWindow.onPrimalComponentCleanup = () => { };
-    primalWindow.onPrimalCacheServerConnected = () => { };
-    primalWindow.onPrimalUploadServerConnected = () => { };
-    primalWindow.onPrimalCacheServerMessageReceived = () => { };
-    primalWindow.onPrimalCacheServerMessageSent = () => { };
+    primalWindow.onPrimalComponentMount = () => {};
+    primalWindow.onPrimalComponentCleanup = () => {};
+    primalWindow.onPrimalCacheServerConnected = () => {};
+    primalWindow.onPrimalUploadServerConnected = () => {};
+    primalWindow.onPrimalCacheServerMessageReceived = () => {};
+    primalWindow.onPrimalCacheServerMessageSent = () => {};
   }
 
   return (
@@ -177,6 +178,7 @@ const AppRouter: Component = () => {
         </Route>
         <Route path="/bookmarks" component={Bookmarks} />
         <Route path="/settings/profile" component={EditProfile} />
+        <Route path="/settings/links" component={ProfileLinksPage} />
         <Route path="/profile/:npub?" component={Profile} />
         <Route path="/p/:npub?">
           <Route path="/" component={Profile} />
