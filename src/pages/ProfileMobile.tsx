@@ -37,6 +37,8 @@ import PhotoSwipeLightbox from 'photoswipe/lightbox';
 import NoteImage from '../components/NoteImage/NoteImage';
 import ProfileQrCodeModal from '../components/ProfileQrCodeModal/ProfileQrCodeModal';
 import { CustomZapInfo, useAppContext } from '../contexts/AppContext';
+import { useWallet } from "../contexts/WalletContext";
+
 import ProfileAbout from '../components/ProfileAbout/ProfileAbout';
 import { Tier, TierCost } from '../components/SubscribeToAuthorModal/SubscribeToAuthorModal';
 import { Kind } from '../constants';
@@ -57,6 +59,7 @@ const ProfileMobile: Component = () => {
   const account = useAccountContext();
   const media = useMediaContext();
   const app = useAppContext();
+  const wallet = useWallet();
 
   const intl = useIntl();
   const navigate = useNavigate();
@@ -603,7 +606,7 @@ const ProfileMobile: Component = () => {
         account.publicKey,
         account.activeRelays,
         exchangeRate,
-        account.activeNWC,
+        wallet
       );
 
       if (!isZapped) {
@@ -768,6 +771,14 @@ const ProfileMobile: Component = () => {
           </div>
 
           <div class={`${styles.profileActions} animated`}>
+              <ButtonSecondary
+              onClick={() => navigate("/settings/links")}
+              shrink={true}
+            >
+              <div class={styles.linkIcon}></div>
+            </ButtonSecondary>
+
+
             <ButtonSecondary
               onClick={() => setOpenQr(true)}
               shrink={true}

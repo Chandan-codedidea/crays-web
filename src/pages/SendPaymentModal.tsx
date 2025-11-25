@@ -24,7 +24,12 @@ const SendPaymentModal: Component<SendPaymentModalProps> = (props) => {
   const [amount, setAmount] = createSignal("");
   const [error, setError] = createSignal("");
   const [isLoading, setIsLoading] = createSignal(false);
-  const [prepareResponse, setPrepareResponse] = createSignal<any>(null);
+  // const [prepareResponse, setPrepareResponse] = createSignal<any>(null);
+  const [prepareResponse, setPrepareResponse] = createSignal<{
+    response: any;
+    paymentType: "lnurl" | "regular";
+  } | null>(null);
+
   const [paymentResult, setPaymentResult] = createSignal<
     "success" | "failure" | null
   >(null);
@@ -60,33 +65,74 @@ const SendPaymentModal: Component<SendPaymentModalProps> = (props) => {
     setError("");
 
     try {
-      // Use wallet.parseInput wrapper
       const parseResult = await wallet.parseInput(input);
       console.log("Parsed input:", parseResult);
 
       setParsedInput(parseResult);
 
-      // Route based on input type
-      if (parseResult.type === "bolt11Invoice") {
-        if (parseResult.amountMsat && parseResult.amountMsat > 0) {
-          const sats = Math.floor(parseResult.amountMsat / 1000);
-          setAmount(String(sats));
-          await prepareSendPayment(input, sats);
-        } else {
+      switch (parseResult.type) {
+        case "bolt11":
+          // BOLT11 invoice
+          if (
+            parseResult.invoice?.amountMsat &&
+            parseResult.invoice.amountMsat > 0
+          ) {
+            const sats = Math.floor(parseResult.invoice.amountMsat / 1000);
+            setAmount(String(sats));
+            await prepareSendPayment(input, sats);
+          } else {
+            setCurrentStep("amount");
+          }
+          break;
+
+        case "lightningAddress":
+          // Lightning address like user@domain.com
+          console.log(
+            "Lightning address detected:",
+            parseResult.address || input
+          );
           setCurrentStep("amount");
-        }
-      } else if (
-        parseResult.type === "bitcoinAddress" ||
-        parseResult.type === "sparkAddress"
-      ) {
-        setCurrentStep("amount");
-      } else if (
-        parseResult.type === "lightningAddress" ||
-        parseResult.type === "lnurlPay"
-      ) {
-        setCurrentStep("amount");
-      } else {
-        setError("Invalid payment destination");
+          break;
+
+        case "lnUrlPay":
+          // LNURL-pay
+          if (parseResult.data?.minSendable && parseResult.data?.maxSendable) {
+            const minSats = Math.floor(parseResult.data.minSendable / 1000);
+            const maxSats = Math.floor(parseResult.data.maxSendable / 1000);
+            console.log(
+              `LNURL-pay: Can send between ${minSats} and ${maxSats} sats`
+            );
+          }
+          setCurrentStep("amount");
+          break;
+
+        case "bitcoinAddress":
+          // On-chain Bitcoin address
+          console.log("Bitcoin address detected:", parseResult.address);
+          setCurrentStep("amount");
+          break;
+
+        case "lnUrlWithdraw":
+          // LNURL-withdraw
+          console.log("LNURL-withdraw detected");
+          setError("LNURL-withdraw is for receiving, not sending payments");
+          break;
+
+        case "nodeId":
+          setError(
+            "Node ID detected. Please provide a Lightning invoice or address."
+          );
+          break;
+
+        case "url":
+          setError(
+            "URL detected. Please provide a valid Lightning payment destination."
+          );
+          break;
+
+        default:
+          setError(`Unsupported payment type: ${parseResult.type}`);
+          console.error("Unknown type:", parseResult.type, parseResult);
       }
     } catch (err: any) {
       console.error("Failed to parse input:", err);
@@ -96,11 +142,19 @@ const SendPaymentModal: Component<SendPaymentModalProps> = (props) => {
     }
   };
 
-  // Prepare payment using wallet wrapper
   const prepareSendPayment = async (
     paymentRequest: string,
     amountSats: number
   ) => {
+    if (
+      !paymentRequest ||
+      typeof paymentRequest !== "string" ||
+      paymentRequest.trim() === ""
+    ) {
+      setError("Payment request is required and must be a valid string");
+      return;
+    }
+
     if (amountSats <= 0) {
       setError("Please enter a valid amount");
       return;
@@ -110,16 +164,90 @@ const SendPaymentModal: Component<SendPaymentModalProps> = (props) => {
     setError("");
 
     try {
-      console.log("Preparing payment:", { paymentRequest, amountSats });
-
-      // Use wallet.prepareSendPayment wrapper with BigInt
-      const response = await wallet.prepareSendPayment({
+      console.log("Preparing payment:", {
         paymentRequest,
-        amount: BigInt(amountSats),
+        amountSats,
+        requestType: typeof paymentRequest,
+        requestLength: paymentRequest.length,
       });
 
-      console.log("Prepare response:", response);
-      setPrepareResponse(response);
+      // Parse the input to detect type
+      const parsed = await wallet.parseInput(paymentRequest.trim());
+
+      console.log("Parsed input:", parsed);
+
+      let response;
+      let paymentType: "lnurl" | "regular";
+
+      // Handle Lightning Address
+      if (parsed.type === "lightningAddress") {
+        console.log("Detected Lightning Address");
+
+        response = await wallet.prepareLnurlPay({
+          amountSats: amountSats,
+          payRequest: parsed.payRequest,
+          comment: undefined,
+          validateSuccessActionUrl: true,
+        });
+
+        paymentType = "lnurl";
+        console.log("Lightning Address payment prepared:", response);
+      }
+      // Handle lnUrlPay type
+      else if (parsed.type === "lnUrlPay") {
+        console.log("Detected LNURL-Pay");
+
+        response = await wallet.prepareLnurlPay({
+          amountSats: amountSats,
+          payRequest: parsed.data,
+          comment: undefined,
+          validateSuccessActionUrl: true,
+        });
+
+        paymentType = "lnurl";
+        console.log("LNURL-Pay prepared:", response);
+      }
+      // Handle regular bolt11 invoice
+      else if (parsed.type === "bolt11") {
+        console.log("Detected Bolt11 invoice");
+
+        response = await wallet.prepareSendPayment({
+          paymentRequest: paymentRequest.trim(),
+          amount: BigInt(amountSats),
+        });
+
+        paymentType = "regular";
+        console.log("Regular payment prepared:", response);
+      } else {
+        setError(`Unsupported payment type: ${parsed.type}`);
+        return;
+      }
+
+      // ✅ Check actual fee from the prepared response
+      console.log("Payment prepared successfully:", response);
+
+      if (response.feeSats !== undefined) {
+        const totalNeeded = amountSats + response.feeSats;
+
+        // Get current balance
+        const info = await wallet.getWalletInfo();
+        const balanceSats = info.balanceSats || 0;
+
+        console.log(
+          `Fee: ${response.feeSats} sats, Total needed: ${totalNeeded} sats, Balance: ${balanceSats} sats`
+        );
+
+        if (balanceSats < totalNeeded) {
+          setError(
+            `Insufficient funds. Need ${totalNeeded} sats (${amountSats} payment + ${response.feeSats} fee), but only have ${balanceSats} sats`
+          );
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Store both response and payment type
+      setPrepareResponse({ response, paymentType });
       setCurrentStep("confirm");
     } catch (err: any) {
       console.error("Failed to prepare payment:", err);
@@ -129,7 +257,7 @@ const SendPaymentModal: Component<SendPaymentModalProps> = (props) => {
     }
   };
 
-  // Send payment using wallet wrapper
+  // Send payment using the correct method
   const handleSendPayment = async () => {
     const prepared = prepareResponse();
     if (!prepared) return;
@@ -139,10 +267,22 @@ const SendPaymentModal: Component<SendPaymentModalProps> = (props) => {
     setError("");
 
     try {
-      // Use wallet.sendPayment wrapper
-      await wallet.sendPayment({ prepareResponse: prepared });
+      let result;
 
-      console.log("Payment sent successfully");
+      if (prepared.paymentType === "lnurl") {
+        // Use lnurlPay for Lightning addresses
+        result = await wallet.lnurlPay({
+          prepareResponse: prepared.response,
+        });
+        console.log("LNURL Payment sent:", result);
+      } else {
+        // Use sendPayment for bolt11
+        result = await wallet.sendPayment({
+          prepareResponse: prepared.response,
+        });
+        console.log("Regular payment sent:", result);
+      }
+
       setPaymentResult("success");
     } catch (err: any) {
       console.error("Payment failed:", err);
@@ -154,7 +294,6 @@ const SendPaymentModal: Component<SendPaymentModalProps> = (props) => {
     }
   };
 
-  // Handle amount submission
   const handleAmountSubmit = async () => {
     const amountNum = parseInt(amount());
 
@@ -163,12 +302,30 @@ const SendPaymentModal: Component<SendPaymentModalProps> = (props) => {
       return;
     }
 
+    // Check wallet balance first
+    try {
+      const info = await wallet.getWalletInfo();
+      const balanceSats = info.balanceSats || 0;
+
+      console.log("Wallet balance:", balanceSats, "sats");
+
+      // ✅ Just check if we have more than the payment amount
+      // The actual fee check will happen after preparing
+      if (balanceSats < amountNum) {
+        setError(
+          `Insufficient funds. Balance: ${balanceSats} sats, need at least ${amountNum} sats`
+        );
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to check balance:", err);
+    }
+
     const input = paymentInput();
     console.log("Submitting amount:", amountNum, "for input:", input);
 
     await prepareSendPayment(input, amountNum);
   };
-
 
   const getPaymentTypeLabel = () => {
     const parsed = parsedInput();

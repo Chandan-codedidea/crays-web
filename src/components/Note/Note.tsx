@@ -12,7 +12,7 @@ import NoteAuthorInfo from './NoteAuthorInfo';
 import NoteRepostHeader from './NoteRepostHeader';
 import NoteReplyToHeader from './NoteReplyToHeader';
 import NoteHeader from './NoteHeader/NoteHeader';
-import { createStore } from 'solid-js/store';
+import { createStore, unwrap } from 'solid-js/store';
 import { CustomZapInfo, useAppContext } from '../../contexts/AppContext';
 import NoteContextTrigger from './NoteContextTrigger';
 import { date, veryLongDate } from '../../lib/dates';
@@ -112,6 +112,9 @@ const Note: Component<NoteProps> = (props) => {
     quoteCount: props.quoteCount || 0,
   });
 
+  
+  console.log(unwrap(reactionsState));
+  
   let noteContextMenu: HTMLDivElement | undefined;
 
   let latestTopZap: string = '';
@@ -191,6 +194,7 @@ const Note: Component<NoteProps> = (props) => {
   };
 
   const onSuccessZap = (zapOption: ZapOption) => {
+    console.log("ENTERED IN ZAP");
     app?.actions.closeCustomZapModal();
     app?.actions.resetCustomZap();
 

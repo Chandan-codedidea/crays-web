@@ -794,22 +794,129 @@
 }
 
 
-.profile-social-links {
+// Profile.module.scss
+
+.profileSocialLinks {
   display: flex;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 0.875rem;
+  flex-wrap: wrap;
+  // margin-top: 1.5rem;
+  // padding: 1rem 0;
 }
-.profile-social-icon {
-  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-  background: #f4f4f4; border-radius: 50%; transition: box-shadow .18s;
+
+.profileSocialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+  
+  // Instagram - Always gradient
+  &:has([data-platform="instagram"]) {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    
+    :global(.socialIconWrapper) {
+      color: white;
+    }
+    
+    &:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 10px 24px rgba(214, 36, 159, 0.5);
+    }
+  }
+  
+  // X (Twitter) - Always Black
+  &:has([data-platform="x"]) {
+    background: #000000;
+    
+    :global(.socialIconWrapper) {
+      color: white;
+    }
+    
+    &:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+    }
+  }
+  
+  // YouTube - Always Red
+  &:has([data-platform="youtube"]) {
+    background: #FF0000;
+    
+    :global(.socialIconWrapper) {
+      color: white;
+    }
+    
+    &:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 10px 24px rgba(255, 0, 0, 0.5);
+    }
+  }
+  
+  // Snapchat - Always Yellow
+  &:has([data-platform="snapchat"]) {
+    background: #FFFC00;
+    
+    :global(.socialIconWrapper) {
+      color: #000000;
+    }
+    
+    &:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 10px 24px rgba(255, 252, 0, 0.5);
+    }
+  }
+  
+  // Facebook - Always Blue
+  &:has([data-platform="facebook"]) {
+    background: #1877F2;
+    
+    :global(.socialIconWrapper) {
+      color: white;
+    }
+    
+    &:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 10px 24px rgba(24, 119, 242, 0.5);
+    }
+  }
+  
+  // TikTok - Always Black with Cyan icon
+  &:has([data-platform="tiktok"]) {
+    background: #010101;
+    border-color: #ff0050;
+    
+    :global(.socialIconWrapper) {
+      color: #00f2ea;
+    }
+    
+    &:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 10px 24px rgba(255, 0, 80, 0.5);
+    }
+  }
+  
+  &:active {
+    transform: translateY(-1px) scale(1.03);
+  }
 }
-.profile-social-icon:hover {
-  box-shadow: 0 0 8px #ccc;
-}
-.edit-profile-socials .social-edit-row {
-  margin-bottom: 8px;
-  display: flex; gap: 8px; align-items: center;
-}
-.edit-profile-socials input {
-  padding: 5px 12px; border-radius: 6px; border: 1px solid #ccc;
+
+:global(.socialIconWrapper) {
+  width: 19px;
+  height: 18px;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
 }

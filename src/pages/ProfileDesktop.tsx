@@ -23,6 +23,7 @@ import { useToastContext } from "../components/Toaster/Toaster";
 import { useSettingsContext } from "../contexts/SettingsContext";
 import { useProfileContext } from "../contexts/ProfileContext";
 import { useAccountContext } from "../contexts/AccountContext";
+import { useWallet } from '../contexts/WalletContext';
 import Wormhole from "../components/Wormhole/Wormhole";
 import { useIntl } from "@cookbook/solid-intl";
 import { sanitize, sendEvent } from "../lib/notes";
@@ -81,6 +82,7 @@ const ProfileDesktop: Component = () => {
   const toaster = useToastContext();
   const profile = useProfileContext();
   const account = useAccountContext();
+  const wallet = useWallet();
   const media = useMediaContext();
   const app = useAppContext();
 
@@ -659,7 +661,7 @@ const ProfileDesktop: Component = () => {
         account.publicKey,
         account.activeRelays,
         exchangeRate,
-        account.activeNWC
+        wallet
       );
 
       if (!isZapped) {
@@ -1005,6 +1007,27 @@ const ProfileDesktop: Component = () => {
                         </a>
                       </div>
                     </Show>
+
+                    {/* Social Links */}
+                    <div class={styles.profileSocialLinks}>
+                      <For
+                        each={getSocialLinks(
+                          profile?.userProfile?.userSocialLinks
+                        )}
+                      >
+                        {(link) => (
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class={styles.profileSocialIcon}
+                            title={link.name}
+                          >
+                            <SocialIcon platform={link.platform} />
+                          </a>
+                        )}
+                      </For>
+                    </div>
                   </div>
                   <div class={styles.columnRight}>
                     <div class={`${styles.followings} animated`}>
@@ -1156,21 +1179,7 @@ const ProfileDesktop: Component = () => {
                           </a>
                         </Show>
                       </div>
-                     
-                      <div class="profile-social-links">
-                        <For each={getSocialLinks(profile?.userProfile)}>
-                          {(link) => (
-                            <a
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="profile-social-icon"
-                            >
-                              <SocialIcon platform={link.platform} />
-                            </a>
-                          )}
-                        </For>
-                      </div>
+
                       <Show when={commonFollowers().length > 0}>
                         <div class={styles.commonFollows}>
                           <div class={styles.label}>Followed by</div>

@@ -14,10 +14,10 @@
   margin-bottom: 18px;
 
   .title {
-    font-size: 1.4em;
+    font-size: 1em;
     font-weight: 700;
     margin: 18px 0 8px 0;
-    color: #6024be;
+    color: #f31549;
     letter-spacing: -0.01em;
   }
   .subtext {
@@ -79,8 +79,8 @@
 
     .label {
       font-weight: 600;
-      font-size: 1em;
-      color: #6024be;
+      font-size: 0.7em;
+      color: #f31549;
       margin-bottom: 2px;
     }
 
@@ -114,19 +114,19 @@
   text-align: center;
 
   .save {
-    padding: 11px 39px;
+    padding: 5px 19px;
     border-radius: 9px;
     color: #fff;
-    background: linear-gradient(90deg,#c0284d 0%,#7f36e1 100%);
+    background: #f31549;
     font-weight: 600;
-    font-size: 1.09em;
+    font-size: 0.8em;
     border: none;
     box-shadow: 0 2px 8px #cab0e244;
     cursor: pointer;
     transition: background 0.15s;
 
     &:hover, &:focus {
-      background: linear-gradient(90deg,#b62e4a 0%,#7f31d2 100%);
+      background: #d70c3c
     }
   }
 }

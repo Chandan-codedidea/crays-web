@@ -75,6 +75,7 @@ export let cacheServer = '';
 
 export const connect = () => {
   if (isNotConnected()) {
+    
     cacheServer =
       localStorage.getItem('cacheServer') ||
       import.meta.env.PRIMAL_CACHE_URL;

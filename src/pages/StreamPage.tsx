@@ -25,6 +25,7 @@ import { fetchPeople } from '../megaFeeds';
 import { NostrEvent, NostrEOSE, NostrEvents, NostrEventContent, NostrLiveChat, PrimalUser, NostrUserZaps, PrimalZap, ZapOption, NostrRelaySignedEvent } from '../types/primal';
 
 import { CustomZapInfo, useAppContext } from '../contexts/AppContext';
+import { useWallet } from '../contexts/WalletContext';
 import { isHashtag, isUrl, sendEvent, triggerImportEvents } from '../lib/notes';
 import { canUserReceiveZaps, convertToZap, zapStream } from '../lib/zap';
 import { readSecFromStorage } from '../lib/localStore';
@@ -52,6 +53,7 @@ const StreamPage: Component = () => {
   const toast = useToastContext();
   const intl = useIntl();
   const app = useAppContext();
+  const wallet = useWallet();
   const settings = useSettingsContext();
 
   const [queryParams, setQueryParams] = useSearchParams();
@@ -902,7 +904,7 @@ const StreamPage: Component = () => {
         amount,
         message,
         account.activeRelays,
-        account.activeNWC,
+        wallet,
       );
 
       setIsZapping(() => false);
