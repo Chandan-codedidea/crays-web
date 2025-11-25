@@ -89,6 +89,7 @@ export const noKey = 'no-key';
 
 export enum Kind  {
   Metadata = 0,
+  SocialLinks = 219,
   Text = 1,
   RecommendRelay = 2,
   Contacts = 3,

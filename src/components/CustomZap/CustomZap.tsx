@@ -124,18 +124,18 @@ const CustomZap: Component<{
     // }
 
      // 2. Check wallet connection
-    if (!wallet.connected()) {
-      toast?.sendWarning('Wallet not connected');
-      return;
-    }
+    // if (!wallet.connected()) {
+    //   toast?.sendWarning('Wallet not connected');
+    //   return;
+    // }
 
     props.onConfirm(selectedValue());
 
     const note = props.note;
 
     if (note) {
-      console.log("IN NOTES BBAY");
       setTimeout(async () => {
+
 
         const zappers: Record<string, Function> = {
           [Kind.Text]: zapNote,
@@ -151,6 +151,9 @@ const CustomZap: Component<{
           account.activeRelays,
           wallet,
         );
+
+        console.log(success);
+
 
         handleZap(success);
       }, lottieDuration());
@@ -221,131 +224,25 @@ const CustomZap: Component<{
     }
   };
 
-  // With NWC
-  // const submit = async () => {
-  //   if (!account?.hasPublicKey()) {
-  //     account?.actions.showGetStarted();
-  //     return;
-  //   }
+  const handleZap = (result: { success: boolean; error?: string }) => {
+    console.log(result);
+  if (result.success) {
+    props.onSuccess(selectedValue());
+    return;
+  }
 
-  //   if (!account.sec || account.sec.length === 0) {
-  //     const sec = readSecFromStorage();
-  //     if (sec) {
-  //       account.actions.setShowPin(sec);
-  //       return;
-  //     }
-  //   }
-
-  //   // if (!account.proxyThroughPrimal && account.relays.length === 0) {
-  //   //   toast?.sendWarning(
-  //   //     intl.formatMessage(toastText.noRelaysConnected),
-  //   //   );
-  //   //   return;
-  //   // }
-
-  //   props.onConfirm(selectedValue());
-
-  //   const note = props.note;
-
-  //   if (note) {
-  //     setTimeout(async () => {
-
-  //       const zappers: Record<string, Function> = {
-  //         [Kind.Text]: zapNote,
-  //         [Kind.LongForm]: zapArticle,
-  //         [Kind.LongFormShell]: zapArticle,
-  //       }
-
-  //       const success = await zappers[note.msg.kind](
-  //         note,
-  //         account.publicKey,
-  //         selectedValue().amount || 0,
-  //         selectedValue().message,
-  //         account.activeRelays,
-  //         account.activeNWC,
-  //       );
-
-  //       handleZap(success);
-  //     }, lottieDuration());
-  //     return;
-  //   }
-
-  //   if (props.profile) {
-  //     const success = await zapProfile(
-  //       props.profile,
-  //       account.publicKey,
-  //       selectedValue().amount || 0,
-  //       selectedValue().message,
-  //       account.activeRelays,
-  //       account.activeNWC,
-  //     );
-
-  //     handleZap(success);
-  //     return;
-  //   }
-
-  //   const dvm = props.dvm;
-  //   const dvmUser = dvm?.user;
-
-  //   if (dvm && dvmUser) {
-  //     setTimeout(async () => {
-
-  //       const success = await zapDVM(
-  //         dvm,
-  //         dvmUser,
-  //         account.publicKey,
-  //         selectedValue().amount || 0,
-  //         selectedValue().message,
-  //         account.activeRelays,
-  //         );
-
-  //         handleZap(success);
-  //       }, lottieDuration());
-  //     return;
-  //   }
-
-  //   if (props.stream && props.streamAuthor) {
-  //     const s = props.stream;
-  //     const a = props.streamAuthor;
-
-  //     setTimeout(async () => {
-  //       const { success, event } = await zapStream(
-  //         s,
-  //         a,
-  //         account.publicKey,
-  //         selectedValue().amount || 0,
-  //         selectedValue().message,
-  //         account.activeRelays,
-  //         account.activeNWC,
-  //       );
-
-  //       if (success && event) {
-  //         props.onSuccess(selectedValue(), event);
-  //         return;
-  //       }
-
-  //       toast?.sendWarning(
-  //         intl.formatMessage(toastZapFail),
-  //       );
-
-  //       props.onFail(selectedValue());
-  //     }, lottieDuration());
-  //     return;
-  //   }
-  // };
-
-  const handleZap = (success = true) => {
-    if (success) {
-      props.onSuccess(selectedValue());
-      return;
-    }
-
+  // Show detailed error if available
+  if (result.error) {
+    toast?.sendWarning(result.error);
+  } else {
     toast?.sendWarning(
-      intl.formatMessage(toastZapFail),
+      intl.formatMessage(toastZapFail)
     );
+  }
 
-    props.onFail(selectedValue());
-  };
+  props.onFail(selectedValue());
+};
+
 
   let md = false;
 

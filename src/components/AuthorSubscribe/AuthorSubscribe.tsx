@@ -8,6 +8,7 @@ import { useAccountContext } from '../../contexts/AccountContext';
 import { CustomZapInfo, useAppContext } from '../../contexts/AppContext';
 import { useSettingsContext } from '../../contexts/SettingsContext';
 import { useThreadContext } from '../../contexts/ThreadContext';
+import { useWallet } from '../../contexts/WalletContext';
 import { fetchUserProfile } from '../../handleNotes';
 import { date, shortDate } from '../../lib/dates';
 import { hookForDev } from '../../lib/devTools';
@@ -33,6 +34,7 @@ const AuthorSubscribe: Component<{
 }> = (props) => {
   const account = useAccountContext();
   const app = useAppContext();
+  const wallet = useWallet();
   const navigate = useNavigate();
   const settings = useSettingsContext();
 
@@ -88,7 +90,7 @@ const AuthorSubscribe: Component<{
         account.publicKey,
         account.activeRelays,
         exchangeRate,
-        account.activeNWC,
+        wallet,
       );
 
       if (!isZapped) {

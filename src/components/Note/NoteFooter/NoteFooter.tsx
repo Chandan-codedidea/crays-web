@@ -1,53 +1,73 @@
-import { batch, Component, createEffect, createSignal, onMount, Show } from 'solid-js';
-import { MenuItem, PrimalNote, ZapOption } from '../../../types/primal';
-import { getMyRepostOfEvent, sendDeleteEvent, sendRepost, triggerImportEvents } from '../../../lib/notes';
+import {
+  batch,
+  Component,
+  createEffect,
+  createSignal,
+  onMount,
+  Show,
+} from "solid-js";
+import { MenuItem, PrimalNote, ZapOption } from "../../../types/primal";
+import {
+  getMyRepostOfEvent,
+  sendDeleteEvent,
+  sendRepost,
+  triggerImportEvents,
+} from "../../../lib/notes";
 
-import styles from './NoteFooter.module.scss';
-import { useAccountContext } from '../../../contexts/AccountContext';
-import { useToastContext } from '../../Toaster/Toaster';
-import { useIntl } from '@cookbook/solid-intl';
+import styles from "./NoteFooter.module.scss";
+import { useAccountContext } from "../../../contexts/AccountContext";
+import { useToastContext } from "../../Toaster/Toaster";
+import { useIntl } from "@cookbook/solid-intl";
 
-import { truncateNumber } from '../../../lib/notifications';
-import { canUserReceiveZaps, lastZapError, zapNote } from '../../../lib/zap';
-import { useSettingsContext } from '../../../contexts/SettingsContext';
+import { truncateNumber } from "../../../lib/notifications";
+import { canUserReceiveZaps, lastZapError, zapNote } from "../../../lib/zap";
+import { useSettingsContext } from "../../../contexts/SettingsContext";
 
-import zapMD from '../../../assets/lottie/zap_md_2.json';
-import { toast as t } from '../../../translations';
-import PrimalMenu from '../../PrimalMenu/PrimalMenu';
-import { hookForDev } from '../../../lib/devTools';
-import { determineOrient, getScreenCordinates, isPhone } from '../../../utils';
-import ZapAnimation from '../../ZapAnimation/ZapAnimation';
-import { CustomZapInfo, useAppContext } from '../../../contexts/AppContext';
-import NoteFooterActionButton from './NoteFooterActionButton';
-import { NoteReactionsState } from '../Note';
-import { SetStoreFunction } from 'solid-js/store';
-import BookmarkNote from '../../BookmarkNote/BookmarkNote';
-import { readSecFromStorage } from '../../../lib/localStore';
-import { useNavigate } from '@solidjs/router';
-import { Kind } from '../../../constants';
-import { APP_ID } from '../../../App';
+import zapMD from "../../../assets/lottie/zap_md_2.json";
+import { toast as t } from "../../../translations";
+import PrimalMenu from "../../PrimalMenu/PrimalMenu";
+import { hookForDev } from "../../../lib/devTools";
+import { determineOrient, getScreenCordinates, isPhone } from "../../../utils";
+import ZapAnimation from "../../ZapAnimation/ZapAnimation";
+import { CustomZapInfo, useAppContext } from "../../../contexts/AppContext";
+import NoteFooterActionButton from "./NoteFooterActionButton";
+import { NoteReactionsState } from "../Note";
+import { SetStoreFunction } from "solid-js/store";
+import BookmarkNote from "../../BookmarkNote/BookmarkNote";
+import { readSecFromStorage } from "../../../lib/localStore";
+import { useNavigate } from "@solidjs/router";
+import { Kind } from "../../../constants";
+import { APP_ID } from "../../../App";
+import { useWallet } from "../../../contexts/WalletContext";
 
-export const lottieDuration = () => zapMD.op * 1_000 / zapMD.fr;
+export const lottieDuration = () => (zapMD.op * 1_000) / zapMD.fr;
 
 const NoteFooter: Component<{
-  note: PrimalNote,
-  size?: 'xwide' | 'wide' | 'normal' | 'compact' | 'short' | 'very_short' | 'notif',
-  id?: string,
-  state: NoteReactionsState,
-  updateState?: SetStoreFunction<NoteReactionsState>,
-  customZapInfo?: CustomZapInfo,
-  large?: boolean,
-  onZapAnim?: (zapOption: ZapOption) => void,
-  onDelete?: (noteId: string, isRepost?: boolean) => void,
-  noteType?: 'primary',
+  note: PrimalNote;
+  size?:
+    | "xwide"
+    | "wide"
+    | "normal"
+    | "compact"
+    | "short"
+    | "very_short"
+    | "notif";
+  id?: string;
+  state: NoteReactionsState;
+  updateState?: SetStoreFunction<NoteReactionsState>;
+  customZapInfo?: CustomZapInfo;
+  large?: boolean;
+  onZapAnim?: (zapOption: ZapOption) => void;
+  onDelete?: (noteId: string, isRepost?: boolean) => void;
+  noteType?: "primary";
 }> = (props) => {
-
   const account = useAccountContext();
   const toast = useToastContext();
   const intl = useIntl();
   const settings = useSettingsContext();
   const app = useAppContext();
   const navigate = useNavigate();
+  const wallet = useWallet();
 
   let medZapAnimation: HTMLElement | undefined;
 
@@ -55,40 +75,43 @@ const NoteFooter: Component<{
   let footerDiv: HTMLDivElement | undefined;
   let repostMenu: HTMLDivElement | undefined;
 
-  const size = () => props.size ?? 'normal';
+  const size = () => props.size ?? "normal";
 
   const repostItem = (): MenuItem => {
-    return props.state.reposted ? {
-      action: () => {
-        app?.actions.openConfirmModal({
-          title: "Delete Repost?",
-          description: "You are about to delete this repost. Are you sure?",
-          confirmLabel: "Yes",
-          abortLabel: "Cancel",
-          onConfirm: () => {
-            doRepostDelete();
-            app.actions.closeConfirmModal();
+    return props.state.reposted
+      ? {
+          action: () => {
+            app?.actions.openConfirmModal({
+              title: "Delete Repost?",
+              description: "You are about to delete this repost. Are you sure?",
+              confirmLabel: "Yes",
+              abortLabel: "Cancel",
+              onConfirm: () => {
+                doRepostDelete();
+                app.actions.closeConfirmModal();
+              },
+              onAbort: () => {
+                app.actions.closeConfirmModal();
+              },
+            });
           },
-          onAbort: () => {app.actions.closeConfirmModal()},
-        })
-      },
-      warning: true,
-      label: 'Delete Repost',
-      icon: 'feed_repost',
-    } :
-    {
-      action: () => doRepost(),
-      label: 'Repost Note',
-      icon: 'feed_repost',
-    };
-  }
+          warning: true,
+          label: "Delete Repost",
+          icon: "feed_repost",
+        }
+      : {
+          action: () => doRepost(),
+          label: "Repost Note",
+          icon: "feed_repost",
+        };
+  };
 
   const repostMenuItems = (): MenuItem[] => [
     repostItem(),
     {
       action: () => doQuote(),
-      label: 'Quote Note',
-      icon: 'quote',
+      label: "Quote Note",
+      icon: "quote",
     },
   ];
 
@@ -100,7 +123,6 @@ const NoteFooter: Component<{
     if (!pubkey) return;
 
     let id: string | undefined = noteToDelete?.note.id;
-
 
     if (!id) {
       id = await getMyRepostOfEvent(props.note.id, pubkey);
@@ -116,7 +138,7 @@ const NoteFooter: Component<{
       Kind.Repost,
       account.activeRelays,
       account.relaySettings,
-      account.proxyThroughPrimal,
+      account.proxyThroughPrimal
     );
 
     if (!success || !deleteEvent) return;
@@ -124,37 +146,37 @@ const NoteFooter: Component<{
     triggerImportEvents([deleteEvent], `delete_import_${APP_ID}`);
 
     // id of the note to remove from UI
-    let removeId = props.note.pubkey === account.publicKey ?
-      id :
-      props.note.noteId;
+    let removeId =
+      props.note.pubkey === account.publicKey ? id : props.note.noteId;
 
-    props.updateState && props.updateState('reposts', (r) => r - 1);
-    props.updateState && props.updateState('reposted', () => false);
+    props.updateState && props.updateState("reposts", (r) => r - 1);
+    props.updateState && props.updateState("reposted", () => false);
 
     props.onDelete && props.onDelete(removeId, true);
   };
 
   const onClickOutside = (e: MouseEvent) => {
     if (
-      !document?.getElementById(`repost_menu_${props.note.post.id}`)?.contains(e.target as Node) &&
+      !document
+        ?.getElementById(`repost_menu_${props.note.post.id}`)
+        ?.contains(e.target as Node) &&
       props.updateState
     ) {
-      props.updateState('isRepostMenuVisible', () => false);
+      props.updateState("isRepostMenuVisible", () => false);
     }
-  }
+  };
 
   createEffect(() => {
     if (props.state.isRepostMenuVisible) {
-      document.addEventListener('click', onClickOutside);
-    }
-    else {
-      document.removeEventListener('click', onClickOutside);
+      document.addEventListener("click", onClickOutside);
+    } else {
+      document.removeEventListener("click", onClickOutside);
     }
   });
 
   const showRepostMenu = (e: MouseEvent) => {
     e.preventDefault();
-    props.updateState && props.updateState('isRepostMenuVisible', () => true);
+    props.updateState && props.updateState("isRepostMenuVisible", () => true);
   };
 
   const doQuote = () => {
@@ -162,7 +184,7 @@ const NoteFooter: Component<{
       account?.actions.showGetStarted();
       return;
     }
-    props.updateState && props.updateState('isRepostMenuVisible', () => false);
+    props.updateState && props.updateState("isRepostMenuVisible", () => false);
     account?.actions?.quoteNote(`nostr:${props.note.post.noteId}`);
     account?.actions?.showNewNoteForm();
   };
@@ -192,24 +214,24 @@ const NoteFooter: Component<{
     //   return;
     // }
 
-    props.updateState && props.updateState('isRepostMenuVisible', () => false);
+    props.updateState && props.updateState("isRepostMenuVisible", () => false);
 
-    const { success } = await sendRepost(props.note, account.proxyThroughPrimal, account.activeRelays, account.relaySettings);
+    const { success } = await sendRepost(
+      props.note,
+      account.proxyThroughPrimal,
+      account.activeRelays,
+      account.relaySettings
+    );
 
     if (success) {
       batch(() => {
-        props.updateState && props.updateState('reposts', (r) => r + 1);
-        props.updateState && props.updateState('reposted', () => true);
+        props.updateState && props.updateState("reposts", (r) => r + 1);
+        props.updateState && props.updateState("reposted", () => true);
       });
 
-      toast?.sendSuccess(
-        intl.formatMessage(t.repostSuccess),
-      );
-    }
-    else {
-      toast?.sendWarning(
-        intl.formatMessage(t.repostFailed),
-      );
+      toast?.sendSuccess(intl.formatMessage(t.repostSuccess));
+    } else {
+      toast?.sendWarning(intl.formatMessage(t.repostFailed));
     }
   };
 
@@ -217,7 +239,6 @@ const NoteFooter: Component<{
     e.preventDefault();
     e.stopPropagation();
     navigate(`/e/${props.note.noteId}`);
-
   };
 
   const doLike = async (e: MouseEvent) => {
@@ -252,8 +273,8 @@ const NoteFooter: Component<{
 
     if (success) {
       batch(() => {
-        props.updateState && props.updateState('likes', (l) => l + 1);
-        props.updateState && props.updateState('liked', () => true);
+        props.updateState && props.updateState("likes", (l) => l + 1);
+        props.updateState && props.updateState("liked", () => true);
       });
     }
   };
@@ -264,7 +285,7 @@ const NoteFooter: Component<{
 
     if (!account?.hasPublicKey()) {
       account?.actions.showGetStarted();
-      props.updateState && props.updateState('isZapping', () => false);
+      props.updateState && props.updateState("isZapping", () => false);
       return;
     }
 
@@ -284,16 +305,15 @@ const NoteFooter: Component<{
     // }
 
     if (!canUserReceiveZaps(props.note.user)) {
-      toast?.sendWarning(
-        intl.formatMessage(t.zapUnavailable),
-      );
-      props.updateState && props.updateState('isZapping', () => false);
+      toast?.sendWarning(intl.formatMessage(t.zapUnavailable));
+      props.updateState && props.updateState("isZapping", () => false);
       return;
     }
 
     quickZapDelay = setTimeout(() => {
-      props.customZapInfo && app?.actions.openCustomZapModal(props.customZapInfo);
-      props.updateState && props.updateState('isZapping', () => true);
+      props.customZapInfo &&
+        app?.actions.openCustomZapModal(props.customZapInfo);
+      props.updateState && props.updateState("isZapping", () => true);
     }, 500);
   };
 
@@ -330,7 +350,7 @@ const NoteFooter: Component<{
 
   const animateZap = () => {
     setTimeout(() => {
-      props.updateState && props.updateState('hideZapIcon', () => true);
+      props.updateState && props.updateState("hideZapIcon", () => true);
 
       if (!medZapAnimation) {
         return;
@@ -339,22 +359,22 @@ const NoteFooter: Component<{
       let newLeft = 33;
       let newTop = -13;
 
-      if (size() === 'xwide') {
+      if (size() === "xwide") {
         newLeft = 46;
         newTop = -7;
       }
 
-      if (size() === 'wide' && props.large) {
+      if (size() === "wide" && props.large) {
         newLeft = 4;
         newTop = -15;
       }
 
-      if (size() === 'short' || size() === 'very_short') {
+      if (size() === "short" || size() === "very_short") {
         newLeft = 21;
         newTop = -13;
       }
 
-      if (size() === 'compact') {
+      if (size() === "compact") {
         newLeft = 26;
         newTop = -6;
       }
@@ -364,14 +384,14 @@ const NoteFooter: Component<{
 
       const onAnimDone = () => {
         batch(() => {
-          props.updateState && props.updateState('showZapAnim', () => false);
-          props.updateState && props.updateState('hideZapIcon', () => false);
-          props.updateState && props.updateState('zapped', () => true);
+          props.updateState && props.updateState("showZapAnim", () => false);
+          props.updateState && props.updateState("hideZapIcon", () => false);
+          props.updateState && props.updateState("zapped", () => true);
         });
-        medZapAnimation?.removeEventListener('complete', onAnimDone);
-      }
+        medZapAnimation?.removeEventListener("complete", onAnimDone);
+      };
 
-      medZapAnimation.addEventListener('complete', onAnimDone);
+      medZapAnimation.addEventListener("complete", onAnimDone);
 
       try {
         // @ts-ignore
@@ -379,7 +399,7 @@ const NoteFooter: Component<{
         // @ts-ignore
         medZapAnimation.play();
       } catch (e) {
-        console.warn('Failed to animte zap:', e);
+        console.warn("Failed to animte zap:", e);
         onAnimDone();
       }
     }, 10);
@@ -392,55 +412,55 @@ const NoteFooter: Component<{
     }
 
     const amount = settings?.defaultZap.amount || 10;
-    const message = settings?.defaultZap.message || '';
+    const message = settings?.defaultZap.message || "";
     const emoji = settings?.defaultZap.emoji;
 
     batch(() => {
-      props.updateState && props.updateState('isZapping', () => true);
-      props.updateState && props.updateState('satsZapped', (z) => z + amount);
-      props.updateState && props.updateState('showZapAnim', () => true);
+      props.updateState && props.updateState("isZapping", () => true);
+      props.updateState && props.updateState("satsZapped", (z) => z + amount);
+      props.updateState && props.updateState("showZapAnim", () => true);
     });
 
-    props.onZapAnim && props.onZapAnim({ amount, message, emoji })
+    props.onZapAnim && props.onZapAnim({ amount, message, emoji });
 
     setTimeout(async () => {
-      const success = await zapNote(
+      const result = await zapNote(
         props.note,
         account.publicKey,
         amount,
         message,
         account.activeRelays,
-        account.activeNWC,
+        wallet
       );
 
-      props.updateState && props.updateState('isZapping', () => false);
+      props.updateState && props.updateState("isZapping", () => false);
 
-      if (success) {
-        props.customZapInfo &&props.customZapInfo.onSuccess({
-          emoji,
-          amount,
-          message,
-        });
+      if (result.success) {
+        props.customZapInfo &&
+          props.customZapInfo.onSuccess({
+            emoji,
+            amount,
+            message,
+          });
 
         return;
       } else {
         app?.actions.openConfirmModal({
           title: "Failed to zap",
-          description: lastZapError || "",
+          description: result.error || lastZapError || "",
           confirmLabel: "ok",
           onConfirm: app.actions.closeConfirmModal,
-          // onAbort: app.actions.closeConfirmModal,
-        })
+        });
+
+        props.customZapInfo &&
+          props.customZapInfo.onFail({
+            emoji,
+            amount,
+            message,
+          });
       }
-
-      props.customZapInfo && props.customZapInfo.onFail({
-        emoji,
-        amount,
-        message,
-      });
     }, lottieDuration());
-
-  }
+  };
 
   const buttonTypeClasses: Record<string, string> = {
     zap: styles.zapType,
@@ -460,7 +480,7 @@ const NoteFooter: Component<{
       id={props.id}
       class={`${styles.footer} ${styles[size()]}`}
       ref={footerDiv}
-      onClick={(e) => e.preventDefault() }
+      onClick={(e) => e.preventDefault()}
     >
       <Show when={props.state.showZapAnim}>
         <ZapAnimation
@@ -476,7 +496,11 @@ const NoteFooter: Component<{
         onClick={doReply}
         type="reply"
         highlighted={props.state.replied}
-        label={props.state.replies === 0 ? '' : truncateNumber(props.state.replies, 2)}
+        label={
+          props.state.replies === 0
+            ? ""
+            : truncateNumber(props.state.replies, 2)
+        }
         title={props.state.replies.toLocaleString()}
         large={props.large}
         noteType={props.noteType}
@@ -491,7 +515,11 @@ const NoteFooter: Component<{
         onTouchEnd={commitZap}
         type="zap"
         highlighted={props.state.zapped || props.state.isZapping}
-        label={props.state.satsZapped === 0 ? '' : truncateNumber(props.state.satsZapped, 2)}
+        label={
+          props.state.satsZapped === 0
+            ? ""
+            : truncateNumber(props.state.satsZapped, 2)
+        }
         hidden={props.state.hideZapIcon}
         title={props.state.satsZapped.toLocaleString()}
         large={props.large}
@@ -503,7 +531,9 @@ const NoteFooter: Component<{
         onClick={doLike}
         type="like"
         highlighted={props.state.liked}
-        label={props.state.likes === 0 ? '' : truncateNumber(props.state.likes, 2)}
+        label={
+          props.state.likes === 0 ? "" : truncateNumber(props.state.likes, 2)
+        }
         title={props.state.likes.toLocaleString()}
         large={props.large}
         noteType={props.noteType}
@@ -511,21 +541,22 @@ const NoteFooter: Component<{
 
       <button
         id={`btn_repost_${props.note.post.id}`}
-        class={`${styles.stat} ${props.state.reposted ? styles.highlighted : ''}`}
+        class={`${styles.stat} ${
+          props.state.reposted ? styles.highlighted : ""
+        }`}
         onClick={showRepostMenu}
         title={props.state.reposts.toLocaleString()}
       >
-        <div
-          class={`${buttonTypeClasses.repost}`}
-          ref={repostMenu}
-        >
+        <div class={`${buttonTypeClasses.repost}`} ref={repostMenu}>
           <div
-            class={`${styles.icon} ${props.large ? styles.large : ''}`}
-            style={'visibility: visible'}
+            class={`${styles.icon} ${props.large ? styles.large : ""}`}
+            style={"visibility: visible"}
           ></div>
-          <Show when={!isPhone() || props.noteType !== 'primary'}>
+          <Show when={!isPhone() || props.noteType !== "primary"}>
             <div class={styles.statNumber}>
-              {props.state.reposts === 0 ? '' : truncateNumber(props.state.reposts, 2)}
+              {props.state.reposts === 0
+                ? ""
+                : truncateNumber(props.state.reposts, 2)}
             </div>
           </Show>
           <PrimalMenu
@@ -539,15 +570,10 @@ const NoteFooter: Component<{
       </button>
 
       <div class={styles.bookmarkFoot}>
-        <BookmarkNote
-          note={props.note}
-          large={props.large}
-          right={true}
-        />
+        <BookmarkNote note={props.note} large={props.large} right={true} />
       </div>
-
     </div>
-  )
-}
+  );
+};
 
 export default hookForDev(NoteFooter);

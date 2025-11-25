@@ -30,6 +30,7 @@ import VerificationCheck from "../components/VerificationCheck/VerificationCheck
 import BookmarkArticle from "../components/BookmarkNote/BookmarkArticle";
 import NoteContextTrigger from "../components/Note/NoteContextTrigger";
 import { CustomZapInfo, useAppContext } from "../contexts/AppContext";
+import { useWallet } from '../contexts/WalletContext';
 import ArticleFooter from "../components/Note/NoteFooter/ArticleFooter";
 import Wormhole from "../components/Wormhole/Wormhole";
 import Search from "../components/Search/Search";
@@ -128,6 +129,7 @@ const Longform: Component< { naddr: string } > = (props) => {
   const media = useMediaContext();
   const settings = useSettingsContext();
   const params = useParams();
+  const wallet = useWallet();
   const intl = useIntl();
   const toast = useToastContext();
   const navigate = useNavigate();
@@ -287,7 +289,7 @@ const Longform: Component< { naddr: string } > = (props) => {
         account.publicKey,
         account.activeRelays,
         exchangeRate,
-        account.activeNWC,
+        wallet,
       );
 
       if (!isZapped) {

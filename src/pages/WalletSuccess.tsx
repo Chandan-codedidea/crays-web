@@ -41,6 +41,7 @@ const WalletSuccess: Component = () => {
       console.log('Creating config...');
       const config = sdk.defaultConfig('mainnet');
       config.apiKey = breezApiKey;
+      config.lnurlDomain = 'pay.crays.net';
       config.privateEnabledDefault = false;
       
       console.log('Initializing wallet...');

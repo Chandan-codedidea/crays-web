@@ -14,9 +14,9 @@ import { useProfileContext } from "../contexts/ProfileContext";
 import { userName } from "../stores/profile";
 import qrcode from "qrcode-generator";
 import SendPaymentModal from "./SendPaymentModal";
-import PageTitle from '../components/PageTitle/PageTitle';
-import { useIntl } from '@cookbook/solid-intl';
-import { wallets as t } from '../translations';
+import PageTitle from "../components/PageTitle/PageTitle";
+import { useIntl } from "@cookbook/solid-intl";
+import { wallets as t } from "../translations";
 type PaymentMethod = "lightning" | "bitcoin";
 
 const WalletDashboard: Component = () => {
@@ -28,7 +28,7 @@ const WalletDashboard: Component = () => {
   const [balance, setBalance] = createSignal(0);
   const [isLoading, setIsLoading] = createSignal(true);
   const [nodeInfo, setNodeInfo] = createSignal<any>(null);
-  const [recentPayments, setRecentPayments] = createSignal<any[]>([]);
+  const [recentPayments, setRecentPayments] = createSignal([]);
   const [error, setError] = createSignal("");
   const [refreshing, setRefreshing] = createSignal(false);
 
@@ -55,6 +55,7 @@ const WalletDashboard: Component = () => {
   const [lightningQR, setLightningQR] = createSignal("");
   const [bitcoinQR, setBitcoinQR] = createSignal("");
   const [copySuccess, setCopySuccess] = createSignal("");
+  const [selectedPayment, setSelectedPayment] = createSignal(null);
 
   // Generate QR codes when addresses change
   createEffect(() => {
@@ -80,16 +81,17 @@ const WalletDashboard: Component = () => {
       setRefreshing(true);
 
       const info = await wallet.getWalletInfo();
-      console.log("Full wallet info:", info);
 
       setNodeInfo(info);
       const balanceSats = info.balanceSats || 0;
       setBalance(balanceSats);
 
       const paymentsResponse = await wallet.getTransactions();
+
       const paymentsArray = Array.isArray(paymentsResponse)
         ? paymentsResponse
         : paymentsResponse?.payments || [];
+
 
       setRecentPayments(paymentsArray.slice(0, 10));
 
@@ -227,6 +229,7 @@ const WalletDashboard: Component = () => {
     try {
       // Try to get existing Lightning address
       const existing = await sdkInstance.getLightningAddress();
+      console.log(existing);
 
       if (existing) {
         const addressString =
@@ -365,37 +368,62 @@ const WalletDashboard: Component = () => {
 
   let refreshInterval: number;
 
+  // onMount(async () => {
+  //   const savedMnemonic = wallet.getSavedMnemonic();
+
+  //   if (!savedMnemonic) {
+  //     navigate("/wallet");
+  //     return;
+  //   }
+
+  //   if (!wallet.connected()) {
+  //     try {
+  //       console.log("Reconnecting wallet...");
+  //       const sdk = await import("@breeztech/breez-sdk-spark");
+  //       await sdk.default();
+
+  //       const breezApiKey = import.meta.env.PRIMAL_BREEZ_API_KEY;
+  //       const config = sdk.defaultConfig("mainnet");
+  //       config.apiKey = breezApiKey;
+  //       config.lnurl_domain = "pay.crays.net";
+
+  //       await wallet.initWallet(savedMnemonic, config);
+  //       console.log("Wallet reconnected");
+  //     } catch (error) {
+  //       console.error("Failed to reconnect:", error);
+  //       setError("Failed to connect wallet. Please try again.");
+  //       setIsLoading(false);
+  //       return;
+  //     }
+  //   }
+
+  //   fetchWalletData();
+  //   refreshInterval = setInterval(fetchWalletData, 30000);
+  // });
+
   onMount(async () => {
-    const savedMnemonic = wallet.getSavedMnemonic();
+  const savedMnemonic = wallet.getSavedMnemonic();
 
-    if (!savedMnemonic) {
-      navigate("/wallet");
-      return;
-    }
+  if (!savedMnemonic) {
+    navigate("/wallet");
+    return;
+  }
 
-    if (!wallet.connected()) {
-      try {
-        console.log("Reconnecting wallet...");
-        const sdk = await import("@breeztech/breez-sdk-spark");
-        await sdk.default();
+  // ✅ Use centralized ensureConnected
+  try {
+    await wallet.ensureConnected();
+    console.log("Wallet connected");
+  } catch (error) {
+    console.error("Failed to connect:", error);
+    setError("Failed to connect wallet. Please try again.");
+    setIsLoading(false);
+    return;
+  }
 
-        const breezApiKey = import.meta.env.PRIMAL_BREEZ_API_KEY;
-        const config = sdk.defaultConfig("mainnet");
-        config.apiKey = breezApiKey;
+  fetchWalletData();
+  refreshInterval = setInterval(fetchWalletData, 30000);
+});
 
-        await wallet.initWallet(savedMnemonic, config);
-        console.log("Wallet reconnected");
-      } catch (error) {
-        console.error("Failed to reconnect:", error);
-        setError("Failed to connect wallet. Please try again.");
-        setIsLoading(false);
-        return;
-      }
-    }
-
-    fetchWalletData();
-    refreshInterval = setInterval(fetchWalletData, 30000);
-  });
 
   onCleanup(() => {
     if (refreshInterval) clearInterval(refreshInterval);
@@ -535,7 +563,11 @@ const WalletDashboard: Component = () => {
               <div class={styles.transactionsList}>
                 <For each={recentPayments()}>
                   {(payment) => (
-                    <div class={styles.transactionItem}>
+                    <div
+                      class={styles.transactionItem}
+                      onClick={() => setSelectedPayment(payment)}
+                      style="cursor: pointer;"
+                    >
                       <div class={styles.transactionIcon}>
                         <Show when={payment.paymentType === "send"}>
                           <svg
@@ -579,12 +611,269 @@ const WalletDashboard: Component = () => {
                           }
                         >
                           {payment.paymentType === "send" ? "-" : "+"}
-                          {formatSats(payment.amount)} sats
+                          {formatSats(Number(payment.amount))} sats
                         </span>
                       </div>
                     </div>
                   )}
                 </For>
+              </div>
+            </Show>
+
+            {/* Payment Details Modal - New Classes */}
+            <Show when={selectedPayment()}>
+              <div
+                class={styles.txnOverlay}
+                onClick={() => setSelectedPayment(null)}
+              >
+                <div
+                  class={styles.txnModal}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Header */}
+                  <div class={styles.txnHeader}>
+                    <button
+                      onClick={() => setSelectedPayment(null)}
+                      class={styles.txnClose}
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M18 6L6 18M6 6L18 18"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Amount Hero Section */}
+                  <div class={styles.txnHero}>
+                    <div
+                      class={
+                        selectedPayment().paymentType === "send"
+                          ? styles.txnIconSend
+                          : styles.txnIconReceive
+                      }
+                    >
+                      <Show when={selectedPayment().paymentType === "send"}>
+                        ↑
+                      </Show>
+                      <Show when={selectedPayment().paymentType === "receive"}>
+                        ↓
+                      </Show>
+                    </div>
+
+                    <h2
+                      class={
+                        selectedPayment().paymentType === "send"
+                          ? styles.txnAmountSend
+                          : styles.txnAmountReceive
+                      }
+                    >
+                      {selectedPayment().paymentType === "send" ? "-" : "+"}
+                      {formatSats(Number(selectedPayment().amount))}
+                      <span class={styles.txnUnit}>sats</span>
+                    </h2>
+
+                    <p class={styles.txnStatusBadge}>
+                      {selectedPayment().status.toUpperCase()}
+                    </p>
+                  </div>
+
+                  {/* Info Cards Grid */}
+                  <div class={styles.txnInfoGrid}>
+                    <div class={styles.txnInfoCard}>
+                      <span class={styles.txnInfoLabel}>Date</span>
+                      <span class={styles.txnInfoValue}>
+                        {formatDate(selectedPayment().timestamp)}
+                      </span>
+                    </div>
+                    <div class={styles.txnInfoCard}>
+                      <span class={styles.txnInfoLabel}>Method</span>
+                      <span class={styles.txnInfoValue}>
+                        {selectedPayment().method}
+                      </span>
+                    </div>
+                    <div class={styles.txnInfoCard}>
+                      <span class={styles.txnInfoLabel}>Fees</span>
+                      <span class={styles.txnInfoValue}>
+                        {selectedPayment().fees} sats
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Copyable Details */}
+                  <div class={styles.txnDetailsList}>
+                    <div class={styles.txnCopyRow}>
+                      <div class={styles.txnCopyInfo}>
+                        <span class={styles.txnCopyLabel}>Transaction ID</span>
+                        <span class={styles.txnCopyText}>
+                          {truncateAddress(selectedPayment().id)}
+                        </span>
+                      </div>
+                      <button
+                        class={styles.txnCopyBtn}
+                        onClick={() =>
+                          copyToClipboard(selectedPayment().id, "id")
+                        }
+                      >
+                        {copySuccess() === "id" ? "✓" : "📋"}
+                      </button>
+                    </div>
+
+                    <Show when={selectedPayment().details}>
+                      <div class={styles.txnCopyRow}>
+                        <div class={styles.txnCopyInfo}>
+                          <span class={styles.txnCopyLabel}>Payment Hash</span>
+                          <span class={styles.txnCopyText}>
+                            {truncateAddress(
+                              selectedPayment().details.paymentHash
+                            )}
+                          </span>
+                        </div>
+                        <button
+                          class={styles.txnCopyBtn}
+                          onClick={() =>
+                            copyToClipboard(
+                              selectedPayment().details.paymentHash,
+                              "hash"
+                            )
+                          }
+                        >
+                          {copySuccess() === "hash" ? "✓" : "📋"}
+                        </button>
+                      </div>
+
+                      <Show when={selectedPayment().details.preimage}>
+                        <div class={styles.txnCopyRow}>
+                          <div class={styles.txnCopyInfo}>
+                            <span class={styles.txnCopyLabel}>Preimage</span>
+                            <span class={styles.txnCopyText}>
+                              {truncateAddress(
+                                selectedPayment().details.preimage
+                              )}
+                            </span>
+                          </div>
+                          <button
+                            class={styles.txnCopyBtn}
+                            onClick={() =>
+                              copyToClipboard(
+                                selectedPayment().details.preimage,
+                                "preimage"
+                              )
+                            }
+                          >
+                            {copySuccess() === "preimage" ? "✓" : "📋"}
+                          </button>
+                        </div>
+                      </Show>
+
+                      <Show when={selectedPayment().details.invoice}>
+                        <div class={styles.txnCopyRow}>
+                          <div class={styles.txnCopyInfo}>
+                            <span class={styles.txnCopyLabel}>Invoice</span>
+                            <span class={styles.txnCopyText}>
+                              {truncateAddress(
+                                selectedPayment().details.invoice
+                              )}
+                            </span>
+                          </div>
+                          <button
+                            class={styles.txnCopyBtn}
+                            onClick={() =>
+                              copyToClipboard(
+                                selectedPayment().details.invoice,
+                                "invoice"
+                              )
+                            }
+                          >
+                            {copySuccess() === "invoice" ? "✓" : "📋"}
+                          </button>
+                        </div>
+                      </Show>
+
+                      <Show when={selectedPayment().details.destinationPubkey}>
+                        <div class={styles.txnCopyRow}>
+                          <div class={styles.txnCopyInfo}>
+                            <span class={styles.txnCopyLabel}>Node Pubkey</span>
+                            <span class={styles.txnCopyText}>
+                              {truncateAddress(
+                                selectedPayment().details.destinationPubkey
+                              )}
+                            </span>
+                          </div>
+                          <button
+                            class={styles.txnCopyBtn}
+                            onClick={() =>
+                              copyToClipboard(
+                                selectedPayment().details.destinationPubkey,
+                                "pubkey"
+                              )
+                            }
+                          >
+                            {copySuccess() === "pubkey" ? "✓" : "📋"}
+                          </button>
+                        </div>
+                      </Show>
+                    </Show>
+                  </div>
+
+                  {/* Explorer Links */}
+                  <div class={styles.txnLinks}>
+                    <a
+                      href="https://mempool.space/lightning"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class={styles.txnExplorerLink}
+                    >
+                      <span>View on Mempool</span>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                      >
+                        <path
+                          d="M6 3H3V13H13V10M10 3H14M14 3V7M14 3L7 10"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </a>
+                    <Show when={selectedPayment().details?.paymentHash}>
+                      <a
+                        href={`https://1ml.com/search?q=${
+                          selectedPayment().details.paymentHash
+                        }`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class={styles.txnExplorerLink}
+                      >
+                        <span>Search on 1ML</span>
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                        >
+                          <path
+                            d="M6 3H3V13H13V10M10 3H14M14 3V7M14 3L7 10"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                          />
+                        </svg>
+                      </a>
+                    </Show>
+                  </div>
+                </div>
               </div>
             </Show>
           </div>
@@ -663,7 +952,7 @@ const WalletDashboard: Component = () => {
                         class={styles.input}
                         disabled={lightningLoading()}
                       />
-                      <span class={styles.inputSuffix}>@breez.tips</span>
+                      {/* <span class={styles.inputSuffix}>@breez.tips</span> */}
                     </div>
 
                     <Show when={lightningError()}>
@@ -786,9 +1075,7 @@ const WalletDashboard: Component = () => {
                       conversion
                     </p>
                     <div class={styles.addressBox}>
-                      <code class={styles.address}>
-                        {bitcoinAddress()}
-                      </code>
+                      <code class={styles.address}>{bitcoinAddress()}</code>
                     </div>
                     <button
                       class={styles.copyButton}

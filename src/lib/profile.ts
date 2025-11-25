@@ -18,6 +18,16 @@ export const getUserProfiles = (pubkeys: string[], subid: string) => {
   ]));
 }
 
+
+export const getUserSocialLinks = (pubkeys: string[], subid: string) => {
+  sendMessage(JSON.stringify([
+    "REQ",
+    subid,
+    {cache: ["user_social_links", { pubkeys }]},
+  ]));
+}
+
+
 export const getUsersRelayInfo = (pubkeys: string[], subid: string) => {
   sendMessage(JSON.stringify([
     "REQ",
@@ -276,11 +286,21 @@ export const isAccountVerified: (domain: string | undefined) => Promise<nip19.Pr
   }
 };
 
-
 export const sendProfile = async (metaData: any, shouldProxy: boolean, relays: Relay[], relaySettings?: NostrRelays) => {
   const event = {
     content: JSON.stringify(metaData),
     kind: Kind.Metadata,
+    tags: [],
+    created_at: Math.floor((new Date()).getTime() / 1000),
+  };
+
+  return await sendEvent(event, relays, relaySettings, shouldProxy);
+};
+
+export const sendSocialLinksCustomKind = async (metaData: any, shouldProxy: boolean, relays: Relay[], relaySettings?: NostrRelays) => {
+  const event = {
+    content: JSON.stringify(metaData),
+    kind: Kind.SocialLinks,
     tags: [],
     created_at: Math.floor((new Date()).getTime() / 1000),
   };

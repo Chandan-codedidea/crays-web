@@ -4,6 +4,7 @@ import { sendArticleRepost } from '../../../lib/notes';
 
 import styles from './NoteFooter.module.scss';
 import { useAccountContext } from '../../../contexts/AccountContext';
+import { useWallet } from "../../../contexts/WalletContext";
 import { useToastContext } from '../../Toaster/Toaster';
 import { useIntl } from '@cookbook/solid-intl';
 
@@ -45,6 +46,7 @@ const ArticleFooter: Component<{
   const intl = useIntl();
   const settings = useSettingsContext();
   const app = useAppContext();
+  const wallet = useWallet();
   const navigate = useNavigate();
 
   let medZapAnimation: HTMLElement | undefined;
@@ -321,7 +323,7 @@ const ArticleFooter: Component<{
         amount,
         message,
         account.activeRelays,
-        account.activeNWC,
+        wallet,
       );
 
       props.updateState('isZapping', () => false);
