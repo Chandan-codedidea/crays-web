@@ -553,6 +553,7 @@ export const getStoredProfile = (pubkey: string) => {
   return undefined;
 };
 
+
 export const setStoredProfile = (profile: PrimalUser) => {
   const store = getStorage(profile.pubkey);
 
@@ -560,7 +561,6 @@ export const setStoredProfile = (profile: PrimalUser) => {
 
   setStorage(profile.pubkey, store);
 };
-
 
 export const saveMsgContacts = (pubkey: string | undefined, contacts: Record<string, PrimalUser>, counts: Record<string, SenderMessageCount>, context: UserRelation) => {
   if (!pubkey) {

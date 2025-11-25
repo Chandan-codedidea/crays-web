@@ -12,6 +12,7 @@ import { fetchKnownProfiles } from '../lib/profile';
 import { nip19 } from '../lib/nTools';
 import { ProfilePointer } from 'nostr-tools/lib/types/nip19';
 import { useAccountContext } from '../contexts/AccountContext';
+import { useWallet } from '../contexts/WalletContext';
 import Avatar from '../components/Avatar/Avatar';
 import { emptyUser, userName } from '../stores/profile';
 import { humanizeNumber } from '../lib/stats';
@@ -55,6 +56,7 @@ const CitadelPage: Component = () => {
   const profile = useProfileContext();
   const account = useAccountContext();
   const params = useParams();
+  const wallet = useWallet();
   const navigate = useNavigate();
   const toast = useToastContext();
   const intl = useIntl();
@@ -920,7 +922,7 @@ const CitadelPage: Component = () => {
         amount,
         message,
         account.activeRelays,
-        account.activeNWC,
+        wallet,
       );
 
       setIsZapping(() => false);
