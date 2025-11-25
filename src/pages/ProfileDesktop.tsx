@@ -74,6 +74,8 @@ import ProfileCardSkeleton from "../components/Skeleton/ProfileCardSkeleton";
 import PremiumCohortInfo from "./Premium/PremiumCohortInfo";
 import { ProfilePointer } from "nostr-tools/lib/types/nip19";
 
+import { getSocialLinks } from "../components/SocialIcon/socialLinks";
+import { SocialIcon } from "../components/SocialIcon/SocialIcon";
 
 const ProfileDesktop: Component = () => {
   const settings = useSettingsContext();
