@@ -1,6 +1,6 @@
 .terms {
-  // background-color: black;
-  color: black;
+  // background-color: #161718;
+  color: #161718;
   max-width: 840px;
   min-width: var(--center-col-w);
   margin-inline: auto;
@@ -8,59 +8,141 @@
   padding-inline: 20px;
   padding-block: 20px;
   font-size: 16px;
+  line-height: 1.7; // Added for better text spacing
+
+  .header {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  h1 {
+    color: #161718;
+    margin: 0;
+    font-weight: 700;
+    font-size: 28px;
+    margin-bottom: 1rem; // Added spacing
+    text-align: center;
+  }
+
+  h2 {
+    color: #161718;
+    margin: 0;
+    font-weight: 700;
+    font-size: 26px;
+    margin-bottom: 1.5rem; // Added spacing
+    border-bottom: 1px solid #e0e0e0; // Added visual separation
+    padding-bottom: 0.5rem;
+  }
+
+  p {
+    color: #161718;
+    font-size: 16px;
+    margin-inline: 0;
+    margin-block: 1rem; // Increased from 12px to 1rem
+    line-height: 1.7; // Added for better readability
+  }
+
+  .lastUpdated {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 2rem;
+  }
+
+  .intro {
+    font-size: 16px;
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
 
   section {
     margin-inline: 0px;
-    margin-block: 12px;
+    margin-block: 2rem; // Increased spacing between sections
+
+    h2 {
+      margin-bottom: 1.5rem;
+    }
+
+    p {
+      margin-block: 1rem; // Consistent paragraph spacing
+    }
 
     section {
       margin-inline: 24px 0px;
-      margin-block: 12px;
+      margin-block: 1.5rem; // Increased spacing for subsections
 
       h3 {
-        color: black;
+        color: #161718;
         margin: 0;
         font-weight: 700;
         display: inline;
         font-size: 16px;
+        margin-bottom: 0.5rem; // Added spacing
 
         &::after {
           content: " ";
         }
       }
+
+      p {
+        margin-inline: 0;
+        margin-block: 1rem; // Consistent paragraph spacing
+        padding-left: 0.5rem; // Slight indentation for subsections
+        line-height: 1.7;
+      }
     }
   }
 
-  h1,
-  h2 {
-    color: black;
-    margin: 0;
-    font-weight: 700;
-  }
+  .subsection {
+    margin-bottom: 1.5rem; // Added for better subsection spacing
 
-  h1 {
-    font-size: 28px;
-  }
+    h3 {
+      display: block !important; // Changed from inline to block for better spacing
+      margin-bottom: 0.75rem !important;
 
-  h2 {
-    font-size: 26px;
-  }
-
-  p {
-    color: black;
-    font-size: 16px;
-    margin-inline: 0;
-    margin-block: 12px;
+      &::after {
+        content: "" !important; // Remove the space after
+      }
+    }
   }
 
   ul {
     padding-left: 2rem;
+    margin-block: 1rem; // Added spacing for lists
 
     li {
-      color: black;
+      color: #161718;
       font-size: 16px;
       margin-inline: 0;
-      margin-block: 12px;
+      margin-block: 0.75rem; // Increased list item spacing
+      line-height: 1.6;
+    }
+  }
+
+  .footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+  }
+
+  .backButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    background: #faa1b6;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #161718;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #e9ecef;
+      border-color: #adb5bd;
+      color: #495057;
     }
   }
 }
@@ -70,13 +152,60 @@
     min-width: unset;
     max-width: unset;
     width: 100%;
+    padding-inline: 16px;
+    font-size: 15px; // Slightly smaller font on mobile
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 1.25rem;
+    }
+
+    p {
+      font-size: 15px;
+      margin-block: 0.875rem;
+    }
 
     section {
       margin-inline: 0;
+      margin-block: 1.5rem;
 
       section {
         margin-inline: 0;
+        margin-block: 1.25rem;
+
+        h3 {
+          font-size: 15px;
+          display: block; // Ensure block display on mobile
+          margin-bottom: 0.5rem;
+        }
+
+        p {
+          padding-left: 0; // Remove indentation on mobile
+        }
       }
+    }
+
+    .subsection {
+      margin-bottom: 1.25rem;
+    }
+
+    ul {
+      padding-left: 1.5rem;
+
+      li {
+        font-size: 15px;
+        margin-block: 0.5rem;
+      }
+    }
+
+    .footer {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
     }
   }
 }
