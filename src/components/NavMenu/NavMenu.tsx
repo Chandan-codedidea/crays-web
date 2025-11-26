@@ -14,7 +14,7 @@ import { ConfirmInfo, useAppContext } from '../../contexts/AppContext';
 import { useDMContext } from '../../contexts/DMContext';
 import ButtonSecondary from '../Buttons/ButtonSecondary';
 
-const NavMenu: Component< { id?: string } > = (props) => {
+const NavMenu: Component<{ id?: string }> = (props) => {
   const account = useAccountContext();
   const notifications = useNotificationsContext();
   const dms = useDMContext();
@@ -63,11 +63,17 @@ const NavMenu: Component< { id?: string } > = (props) => {
       label: intl.formatMessage(t.downloads),
       icon: 'downloadIcon',
       bubble: () => notifications?.downloadsCount || 0,
-    }, 
+    },
     {
       to: '/wallet',
       label: intl.formatMessage(t.wallet),
       icon: 'walletIcon',
+    },
+    {
+      to: 'https://opencollective.com/crays/contribute',
+      label: 'Founders Club',
+      icon: 'foundersIcon',
+      isExternal: true,
     },
     {
       to: '/settings',
@@ -97,13 +103,14 @@ const NavMenu: Component< { id?: string } > = (props) => {
     <div id={props.id} class={styles.navMenu}>
       <nav class={styles.sideNav}>
         <For each={links}>
-          {({ to, label, icon, bubble, hiddenOnSmallScreens }) => {
+          {({ to, label, icon, bubble, hiddenOnSmallScreens, isExternal }) => {
             return <NavLink
               to={to}
               label={label}
               icon={icon}
               bubble={bubble}
               hiddenOnSmallScreens={hiddenOnSmallScreens}
+              isExternal={isExternal}
             />
           }
           }

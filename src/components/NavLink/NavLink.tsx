@@ -12,6 +12,7 @@ const NavLink: Component<{
   bubble?: () => number,
   hiddenOnSmallScreens?: boolean,
   isPhone?: boolean,
+  isExternal?: boolean,
 }> = (props) => {
   const location = useLocation();
 
@@ -36,26 +37,46 @@ const NavLink: Component<{
     return styles.tripleSize;
   }
 
-    return (
-      <div id={props.id} class={`${styles.navLink} ${props.isPhone ? styles.phoneNavLink : ''}`}>
-        <A
+  const isExternal = () => props.isExternal || props.to.startsWith('http://') || props.to.startsWith('https://');
+
+  return (
+    <div id={props.id} class={`${styles.navLink} ${props.isPhone ? styles.phoneNavLink : ''}`}>
+      <Show
+        when={isExternal()}
+        fallback={
+          <A
+            href={props.to}
+            activeClass={styles.active}
+            inactiveClass={styles.inactive}
+            onClick={scrollIfInactive}
+          >
+            <div class={styles[props.icon]}></div>
+            <Show when={props.label}>
+              <div class={styles.label}>{props.label}</div>
+            </Show>
+          </A>
+        }
+      >
+        <a
           href={props.to}
-          activeClass={styles.active}
-          inactiveClass={styles.inactive}
-          onClick={scrollIfInactive}
+          target="_blank"
+          rel="noopener noreferrer"
+          class={styles.inactive}
         >
           <div class={styles[props.icon]}></div>
           <Show when={props.label}>
             <div class={styles.label}>{props.label}</div>
           </Show>
-        </A>
-        <Show when={props.bubble && props.bubble() > 0}>
-          <div class={`${styles.bubble} ${bubbleClass()}`}>
-            <div>{props.bubble && props.bubble() < 100 ? props.bubble() : '99+'}</div>
-          </div>
-        </Show>
-      </div>
-    )
+        </a>
+      </Show>
+      <Show when={props.bubble && props.bubble() > 0}>
+        <div class={`${styles.bubble} ${bubbleClass()}`}>
+          <div>{props.bubble && props.bubble() < 100 ? props.bubble() : '99+'}</div>
+        </div>
+      </Show>
+    </div>
+  )
 }
 
 export default hookForDev(NavLink);
+
