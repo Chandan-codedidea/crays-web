@@ -86,6 +86,11 @@ const Menu: Component = () => {
           Imprint
           <div class={styles.chevron}></div>
         </A>
+
+        <A href="/privacy">
+          Privacy Policy
+          <div class={styles.chevron}></div>
+        </A>
       </div>
 
       <Show when={account?.sec}>
