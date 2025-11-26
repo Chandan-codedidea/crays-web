@@ -91,6 +91,11 @@ const Menu: Component = () => {
           Privacy Policy
           <div class={styles.chevron}></div>
         </A>
+
+        <A href="/terms">
+          Terms of Service
+          <div class={styles.chevron}></div>
+        </A>
       </div>
 
       <Show when={account?.sec}>
