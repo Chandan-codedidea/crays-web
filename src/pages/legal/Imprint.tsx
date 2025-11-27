@@ -56,7 +56,7 @@ const Imprint: Component = () => {
                 <section class={styles.section}>
                     <h2>Global Headquarter | Operational Business</h2>
                     <p class={styles.address}>
-                        Crays Circle Ltd.<br />
+                        Crays Ltd.<br />
                         Unit D134, Office 2905, Floor 29, Sky Tower<br />
                         Shams Abu Dhabi, Abu Dhabi, AlReem Island<br />
                         United Arab Emirates
