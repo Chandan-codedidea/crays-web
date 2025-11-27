@@ -12,6 +12,9 @@ const Imprint: Component = () => {
         <div class={styles.imprint}>
             <header class={styles.header}>
                 <Branding />
+                <button class={styles.backButton} onClick={handleGoBack}>
+                    ← Back
+                </button>
             </header>
 
             <div class={styles.content}>
@@ -71,9 +74,6 @@ const Imprint: Component = () => {
 
             <footer class={styles.footer}>
                 <div class={styles.footerContent}>
-                    <button class={styles.backButton} onClick={handleGoBack}>
-                        ← Back
-                    </button>
                     <div class={styles.copyright}>
                         &copy; {new Date().getFullYear()} Crays. All rights reserved.
                     </div>
