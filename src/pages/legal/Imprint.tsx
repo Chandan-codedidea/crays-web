@@ -23,9 +23,13 @@ const Imprint: Component = () => {
                 <div class={styles.section}>
                     <p class={styles.address}>
                         Crays Crypto Nomads DAO Association<br />
-                        Dammstrasse 16<br />
-                        6300 Zug, Switzerland
+                        Dammstrasse 16, 6300 Zug, Switzerland
+                        <br />
+                        President: Kai Thorben Biesenbach <br />
+                        Mail: tb@crays.org
+
                     </p>
+
 
                     <p class={styles.intro}>
                         The Crays Crypto Nomads DAO Association is structured around several key governing bodies to ensure transparent and efficient operations.
@@ -57,17 +61,21 @@ const Imprint: Component = () => {
                 </div>
 
                 <section class={styles.section}>
-                    <h2>Global Headquarter | Operational Business</h2>
+                    <h2>Holding & Operational Business</h2>
                     <p class={styles.address}>
-                        Crays Ltd.<br />
+                        <strong>Global Headquarter & Holding | Crays Ltd.</strong> <br />
+
                         Unit D134, Office 2905, Floor 29, Sky Tower<br />
-                        Shams Abu Dhabi, Abu Dhabi, AlReem Island<br />
-                        United Arab Emirates
+                        Shams Abu Dhabi, Abu Dhabi, AlReem Island, UAE <br />
+                        CEO: Kai Thorben Biesenbach <br />
+                        Mail: tb@crays.world <br />
                     </p>
-                    <p class={styles.contact}>
-                        CEO, Kai Thorben Biesenbach<br />
-                        Crays<br />
-                        E-Mail: tb@crays.org
+                    <p class={styles.address}>
+                        <strong>Operational Business | Crays Circle Ltd.</strong> <br />
+                        28 Griva Digeni Avenue, 1st Foor<br />
+                        Nicosia 1066, Cyprus<br />
+                        CEO: Kai Thorben Biesenbach <br />
+                        Mail: tb@crays.net
                     </p>
                 </section>
             </div>
