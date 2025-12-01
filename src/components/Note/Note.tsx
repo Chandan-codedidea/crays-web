@@ -113,8 +113,6 @@ const Note: Component<NoteProps> = (props) => {
   });
 
   
-  console.log(unwrap(reactionsState));
-  
   let noteContextMenu: HTMLDivElement | undefined;
 
   let latestTopZap: string = '';

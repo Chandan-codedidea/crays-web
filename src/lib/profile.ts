@@ -19,15 +19,6 @@ export const getUserProfiles = (pubkeys: string[], subid: string) => {
 }
 
 
-export const getUserSocialLinks = (pubkeys: string[], subid: string) => {
-  sendMessage(JSON.stringify([
-    "REQ",
-    subid,
-    {cache: ["user_social_links", { pubkeys }]},
-  ]));
-}
-
-
 export const getUsersRelayInfo = (pubkeys: string[], subid: string) => {
   sendMessage(JSON.stringify([
     "REQ",

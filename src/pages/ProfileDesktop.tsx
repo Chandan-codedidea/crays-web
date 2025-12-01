@@ -23,11 +23,15 @@ import { useToastContext } from "../components/Toaster/Toaster";
 import { useSettingsContext } from "../contexts/SettingsContext";
 import { useProfileContext } from "../contexts/ProfileContext";
 import { useAccountContext } from "../contexts/AccountContext";
-import { useWallet } from '../contexts/WalletContext';
+import { useWallet } from "../contexts/WalletContext";
 import Wormhole from "../components/Wormhole/Wormhole";
 import { useIntl } from "@cookbook/solid-intl";
 import { sanitize, sendEvent } from "../lib/notes";
 import { shortDate } from "../lib/dates";
+import SubscriptionModal from "./SubscriptionModal";
+import SubscribeModal from "./SubscribeModal";
+
+import { fetchUserSubscriptionSettings } from "../lib/nostrSubscriptions";
 
 import styles from "./Profile.module.scss";
 import StickySidebar from "../components/StickySidebar/StickySidebar";
@@ -76,6 +80,7 @@ import { ProfilePointer } from "nostr-tools/lib/types/nip19";
 
 import { getSocialLinks } from "../components/SocialIcon/socialLinks";
 import { SocialIcon } from "../components/SocialIcon/SocialIcon";
+import { unwrap } from "solid-js/store";
 
 const ProfileDesktop: Component = () => {
   const settings = useSettingsContext();
@@ -94,6 +99,18 @@ const ProfileDesktop: Component = () => {
   const [showContext, setContext] = createSignal(false);
   const [confirmReportUser, setConfirmReportUser] = createSignal(false);
   const [confirmMuteUser, setConfirmMuteUser] = createSignal(false);
+  const [isModalOpen, setIsModalOpen] = createSignal(false);
+  const [subscriptionSettings, setSubscriptionSettings] = createSignal(null);
+  const [isSubscribeModalOpen, setIsSubscribeModalOpen] = createSignal(false);
+
+  
+  createEffect(async () => {
+    if (profile?.profileKey) {
+      setSubscriptionSettings(
+        await fetchUserSubscriptionSettings(profile?.profileKey)
+      );
+    }
+  });
 
   const [followsModal, setFollowsModal] = createSignal<
     "follows" | "followers" | false
@@ -761,6 +778,9 @@ const ProfileDesktop: Component = () => {
     return media?.actions.getStream(profile?.profileKey || "n/a", true);
   };
 
+  const hasSubscription =
+    subscriptionSettings() && subscriptionSettings().monthlyPrice;
+
   return (
     <>
       <PageTitle
@@ -874,12 +894,14 @@ const ProfileDesktop: Component = () => {
               />
             </div>
 
-            <ButtonSecondary
-              onClick={() => navigate("/settings/links")}
-              shrink={true}
-            >
-              <div class={styles.linkIcon}></div>
-            </ButtonSecondary>
+            <Show when={isCurrentUser()}>
+              <ButtonSecondary
+                onClick={() => navigate("/settings/links")}
+                shrink={true}
+              >
+                <div class={styles.linkIcon}></div>
+              </ButtonSecondary>
+            </Show>
 
             <ButtonSecondary
               onClick={() =>
@@ -1029,6 +1051,7 @@ const ProfileDesktop: Component = () => {
                       </For>
                     </div>
                   </div>
+
                   <div class={styles.columnRight}>
                     <div class={`${styles.followings} animated`}>
                       <button
@@ -1086,6 +1109,7 @@ const ProfileDesktop: Component = () => {
                   </div>
                 </div>
               </Match>
+
               <Match when={!shortProfileAbout(profile?.userProfile?.about)}>
                 <div class={styles.bigAbout}>
                   <div class={`${styles.basicInfo} animated`}>
@@ -1206,6 +1230,80 @@ const ProfileDesktop: Component = () => {
                 </div>
               </Match>
             </Switch>
+
+            {/* Manage Subscriptions */}
+            <Show when={isCurrentUser()}>
+              {/* Always render subscription management UI for own profile */}
+              <div class={styles.subscriptionCard}>
+                <h2 class={styles.title}>
+                  <span class={styles.lightningIcon}>⚡</span>
+                  {hasSubscription ? (
+                    <>
+                      Subscriptions from
+                      <br />
+                      {subscriptionSettings().monthlyPrice.toLocaleString()}{" "}
+                      sats / month
+                    </>
+                  ) : (
+                    "Subscriptions from 10,000 sats / month"
+                  )}
+                </h2>
+                <p class={styles.paymentInfo}>Lightning payments only</p>
+                {/* <div class={styles.stats}>
+                  0 active · 0 expiring soon · 0 lapsed
+                </div> */}
+                <button
+                  class={styles.manageButton}
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  {subscriptionSettings() ? "Manage" : "Create Subscription"}
+                </button>
+                <SubscriptionModal
+                  isOpen={isModalOpen()}
+                  onClose={() => setIsModalOpen(false)}
+                  currentSubscribers={{
+                    active: 0,
+                    expiringSoon: 0,
+                    lapsed: 0,
+                  }}
+                  currentEarnings={{
+                    subscriptions: 0,
+                    ppv: 0,
+                    tips: 0,
+                    paidDMs: 0,
+                  }}
+                  initialSettings={subscriptionSettings() || undefined} // Pass initial config if it exists
+                />
+              </div>
+            </Show>
+            <Show when={!isCurrentUser()}>
+              <Show when={subscriptionSettings() !== null}>
+                {/* Only show if the other user HAS subscription set up */}
+                <div class={styles.subscriptionCard}>
+                  <h2 class={styles.title}>
+                    <span class={styles.lightningIcon}>⚡</span>
+                    Subscribe for
+                    <br />
+                    {subscriptionSettings().monthlyPrice.toLocaleString()} sats
+                    / month
+                  </h2>
+                  <p class={styles.paymentInfo}>Lightning payments only</p>
+                  <button
+                    class={styles.buyButton}
+                    onClick={() => setIsSubscribeModalOpen(true)}
+                  >
+                    Subscribe
+                  </button>
+                  <SubscribeModal
+                    isOpen={isSubscribeModalOpen()}
+                    onClose={() => setIsSubscribeModalOpen(false)}
+                    monthlyPrice={subscriptionSettings().monthlyPrice}
+                    bundles={subscriptionSettings().bundles}
+                    targetPubkey={profile?.profileKey}
+                  />
+                </div>
+              </Show>
+            </Show>
           </div>
         </div>
       </Show>

@@ -137,6 +137,12 @@ export const pin = {
 };
 
 export const actions = {
+  
+  noSubscriptionPosts: {
+    id: 'actions.noSubscriptionPosts',
+    defaultMessage: 'No subscription post',
+    description: 'No subscriptions label',
+  },
   resetRelays: {
     id: 'actions.resetRelays',
     defaultMessage: 'Reset relays',
@@ -250,6 +256,11 @@ export const actions = {
   notePostNew: {
     id: 'actions.notePostNew',
     defaultMessage: 'Post',
+    description: 'Send new note, button label',
+  },
+  notePostSubscribersNew: {
+    id: 'actions.notePostSubscribersNew',
+    defaultMessage: 'Subscriber Only',
     description: 'Send new note, button label',
   },
   noteReply: {
@@ -1443,6 +1454,11 @@ export const profile = {
       defaultMessage: 'Relays',
       description: 'Label for sats profile relays',
     },
+    subscriptions: {
+      id: 'profile.stats.subscriptions',
+      defaultMessage: 'Subscriptions',
+      description: 'Label for subscription profile stat',
+    }
   },
   isMuted: {
     id: 'profile.isMuted',
