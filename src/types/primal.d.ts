@@ -879,6 +879,7 @@ export type UserStats = {
   relay_count: number;
   media_count: number;
   long_form_note_count?: number;
+  total_subscription_count?: number;
   followers_increase?: {
     increase: number;
     ratio: number;
@@ -915,6 +916,14 @@ export type PrimalUser = {
   userSocialLinks?: UserSocialLinks;
   msg: NostrUserContent;
 };
+
+export type SubscriptionSettings = {
+  monthlyPrice: number;
+  bundles: { months: number; discountPercent: number }[];
+  pageType: 'paid' | 'free';
+  version: string;
+};
+
 
 export type PrimalNoteData = {
   id: string;

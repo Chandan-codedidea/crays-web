@@ -245,14 +245,14 @@ const NostrWalletConnect: Component = () => {
 
       <div class={styles.settingsContentFullBorderless}>
         <div class={styles.walletList}>
-          <NWCItem
+          {/* <NWCItem
             logo={logo}
             name="Crays"
             desc={primalWalletDesc()}
             status={walletStatus['primal']}
             onConnect={() => connectToPrimalWallet()}
             onDisconnect={() => disconnectNWC('primal')}
-          />
+          /> */}
           <For each={account?.nwcList}>
             {([name, uri]) => (
               <NWCItem

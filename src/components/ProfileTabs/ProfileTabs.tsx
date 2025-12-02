@@ -1,9 +1,24 @@
 import { useIntl } from "@cookbook/solid-intl";
 import { Tabs } from "@kobalte/core/tabs";
 import { A, useLocation, useNavigate } from "@solidjs/router";
-import { Component, createEffect, createSignal, For, Match, on, onCleanup, onMount, Show, Switch } from "solid-js";
+import {
+  Component,
+  createEffect,
+  createSignal,
+  For,
+  Match,
+  on,
+  onCleanup,
+  onMount,
+  Show,
+  Switch,
+} from "solid-js";
 import { createStore } from "solid-js/store";
-import { imageOrVideoRegex, Kind, profileContactListPage } from "../../constants";
+import {
+  imageOrVideoRegex,
+  Kind,
+  profileContactListPage,
+} from "../../constants";
 import { useAccountContext } from "../../contexts/AccountContext";
 import { useMediaContext } from "../../contexts/MediaContext";
 import { useProfileContext } from "../../contexts/ProfileContext";
@@ -18,7 +33,7 @@ import Loader from "../Loader/Loader";
 import Note from "../Note/Note";
 import Paginator from "../Paginator/Paginator";
 
-import styles from  "./ProfileTabs.module.scss";
+import styles from "./ProfileTabs.module.scss";
 import NoteGallery from "../Note/NoteGallery";
 import ProfileNoteZap from "../ProfileNoteZap/ProfileNoteZap";
 import FeedNoteSkeleton from "../Skeleton/FeedNoteSkeleton";
@@ -28,14 +43,14 @@ import ZapSkeleton from "../Skeleton/ZapSkeleton";
 import ProfileGalleryImageSkeleton from "../Skeleton/ProfileGalleryImageSkeleton";
 import { scrollWindowTo } from "../../lib/scroll";
 import { nip19 } from "nostr-tools";
-
+import { validateSubscriptionAccess } from "../../lib/nostrSubscriptions";
+import SubscribeButton from "../SubscribeButton";
 
 const ProfileTabs: Component<{
-  id?: string,
-  setProfile?: (pk: string) => void,
-  profileKey: string,
+  id?: string;
+  setProfile?: (pk: string) => void;
+  profileKey: string;
 }> = (props) => {
-
   const intl = useIntl();
   const profile = useProfileContext();
   const account = useAccountContext();
@@ -44,8 +59,8 @@ const ProfileTabs: Component<{
   const navigate = useNavigate();
 
   const hash = () => {
-    return (location.hash.length > 1) ? location.hash.substring(1) : 'notes';
-  }
+    return location.hash.length > 1 ? location.hash.substring(1) : "notes";
+  };
 
   const [currentTab, setCurrentTab] = createSignal<string>(hash());
 
@@ -57,11 +72,15 @@ const ProfileTabs: Component<{
   };
 
   const isMuted = (pk: string | undefined, ignoreContentCheck = false) => {
-    const isContentMuted = account?.mutelists.find(x => x.pubkey === account.publicKey)?.content;
+    const isContentMuted = account?.mutelists.find(
+      (x) => x.pubkey === account.publicKey
+    )?.content;
 
-    return pk &&
+    return (
+      pk &&
       account?.muted.includes(pk) &&
-      (ignoreContentCheck ? true : isContentMuted);
+      (ignoreContentCheck ? true : isContentMuted)
+    );
   };
 
   const isFiltered = () => {
@@ -75,7 +94,7 @@ const ProfileTabs: Component<{
       return;
     }
 
-    account.actions.removeFromMuteList(pk, 'user', () => {
+    account.actions.removeFromMuteList(pk, "user", () => {
       props.setProfile && props.setProfile(pk);
       onChangeValue(currentTab());
     });
@@ -84,8 +103,7 @@ const ProfileTabs: Component<{
   const onContactAction = (remove: boolean, pubkey: string) => {
     if (remove) {
       profile?.actions.removeContact(pubkey);
-    }
-    else {
+    } else {
       profile?.actions.addContact(pubkey, profile.followers);
     }
   };
@@ -108,13 +126,14 @@ const ProfileTabs: Component<{
       return bFollowers >= aFollowers ? 1 : -1;
     });
 
-    setContacts(() => [ ...(cts.slice(0, contactsOffset() + profileContactListPage))]);
-
+    setContacts(() => [
+      ...cts.slice(0, contactsOffset() + profileContactListPage),
+    ]);
   });
 
   const loadMoreFollows = () => {
     setContactsOffset(contactsOffset() + profileContactListPage);
-  }
+  };
 
   // We have a client side paginataion
   const [followersOffset, setFollowersOffset] = createSignal(0);
@@ -134,25 +153,35 @@ const ProfileTabs: Component<{
       return bFollowers >= aFollowers ? 1 : -1;
     });
 
-    setFollowers((fs) => [ ...fs, ...(cts.slice(followersOffset(), followersOffset() + profileContactListPage))]);
-
+    setFollowers((fs) => [
+      ...fs,
+      ...cts.slice(
+        followersOffset(),
+        followersOffset() + profileContactListPage
+      ),
+    ]);
   });
 
   const loadMoreFollowers = () => {
     setFollowersOffset(followersOffset() + profileContactListPage);
-  }
+  };
 
-  createEffect(on(() => props.profileKey, (v,p) => {
-    if (!v || v === p) return;
-    const value = hash();
+  createEffect(
+    on(
+      () => props.profileKey,
+      (v, p) => {
+        if (!v || v === p) return;
+        const value = hash();
 
-    profile?.actions.clearNotes();
-    profile?.actions.clearArticles();
-    profile?.actions.clearGallery();
-    profile?.actions.clearZaps();
-    profile?.actions.clearReplies();
-    updateTabContent(value);
-  }))
+        profile?.actions.clearNotes();
+        profile?.actions.clearArticles();
+        profile?.actions.clearGallery();
+        profile?.actions.clearZaps();
+        profile?.actions.clearReplies();
+        updateTabContent(value);
+      }
+    )
+  );
 
   const onChangeValue = (value: string) => {
     setCurrentTab(() => value);
@@ -167,592 +196,753 @@ const ProfileTabs: Component<{
   const updateTabContent = (value: string) => {
     if (!profile) return;
 
-    switch(value) {
-      case 'reads':
-        profile.articles.length === 0 && profile.actions.getProfileMegaFeed(props.profileKey, 'reads');
+    switch (value) {
+      case "reads":
+        profile.articles.length === 0 &&
+          profile.actions.getProfileMegaFeed(props.profileKey, "reads");
         break;
-      case 'notes':
-        profile.notes.length === 0 && profile.actions.getProfileMegaFeed(props.profileKey, 'notes');
+      case "notes":
+        profile.notes.length === 0 &&
+          profile.actions.getProfileMegaFeed(props.profileKey, "notes");
         break;
-      case 'replies':
-        profile.replies.length === 0 && profile.actions.getProfileMegaFeed(props.profileKey, 'replies');
+      case "replies":
+        profile.replies.length === 0 &&
+          profile.actions.getProfileMegaFeed(props.profileKey, "replies");
         break;
-      case 'media':
-        profile.gallery.length === 0 && profile.actions.getProfileMegaFeed(props.profileKey, 'media');
+      case "media":
+        profile.gallery.length === 0 &&
+          profile.actions.getProfileMegaFeed(props.profileKey, "media");
         break;
-      case 'zaps':
-        profile.zaps.length === 0 && profile.actions.fetchZapList(props.profileKey);
+      case "zaps":
+        profile.zaps.length === 0 &&
+          profile.actions.fetchZapList(props.profileKey);
         break;
-      case 'relays':
-        Object.keys(profile.relays || {}).length === 0 && profile.actions.fetchRelayList(props.profileKey);
+      case "relays":
+        Object.keys(profile.relays || {}).length === 0 &&
+          profile.actions.fetchRelayList(props.profileKey);
         break;
     }
-  }
+  };
 
   const galleryImages = () => {
-    return profile?.gallery.filter(note => {
-      const test = (imageOrVideoRegex).test(note.content);
+    return profile?.gallery.filter((note) => {
+      const test = imageOrVideoRegex.test(note.content);
       return test;
     });
   };
 
   const hasImages = (note: PrimalNote) => {
-    const test = (imageOrVideoRegex).test(note.content);
+    const test = imageOrVideoRegex.test(note.content);
     return test;
-  }
+  };
 
   const getZapSubject = (zap: PrimalZap) => {
     if (zap.zappedKind === Kind.Text) {
-      return profile?.zappedNotes.find(n => n.id === zap.zappedId);
+      return profile?.zappedNotes.find((n) => n.id === zap.zappedId);
     }
 
     if (zap.zappedKind === Kind.LongForm) {
-      return profile?.zappedArticles.find(a => [a.noteId, a.id].includes(zap.zappedId || ''));
+      return profile?.zappedArticles.find((a) =>
+        [a.noteId, a.id].includes(zap.zappedId || "")
+      );
     }
 
     if (zap.zappedKind === Kind.Metadata) {
-      return zap.reciver
+      return zap.reciver;
     }
-
 
     return undefined;
-  }
+  };
 
-  createEffect(on(currentTab, (tab, prev) => {
-    if (tab === prev) {
-      return;
-    }
+  createEffect(
+    on(currentTab, (tab, prev) => {
+      if (tab === prev) {
+        return;
+      }
 
-    if (tab === 'notes' && !profile?.isFetching) {
-      scrollWindowTo(profile?.scrollTop.notes);
-      return;
-    }
+      if (tab === "notes" && !profile?.isFetching) {
+        scrollWindowTo(profile?.scrollTop.notes);
+        return;
+      }
 
-    if (tab === 'reads' && !profile?.isFetching) {
-      scrollWindowTo(profile?.scrollTop.reads);
-      return;
-    }
+      if (tab === "reads" && !profile?.isFetching) {
+        scrollWindowTo(profile?.scrollTop.reads);
+        return;
+      }
 
-    if (tab === 'replies' && !profile?.isFetchingReplies) {
-      scrollWindowTo(profile?.scrollTop.replies);
-      return;
-    }
+      if (tab === "replies" && !profile?.isFetchingReplies) {
+        scrollWindowTo(profile?.scrollTop.replies);
+        return;
+      }
 
-    if (tab === 'media' && !profile?.isFetchingGallery) {
-      scrollWindowTo(profile?.scrollTop.media);
-      return;
-    }
+      if (tab === "media" && !profile?.isFetchingGallery) {
+        scrollWindowTo(profile?.scrollTop.media);
+        return;
+      }
 
-    if (tab === 'zaps' && !profile?.isFetchingZaps) {
-      scrollWindowTo(profile?.scrollTop.zaps);
-      return;
-    }
-  }));
+      if (tab === "zaps" && !profile?.isFetchingZaps) {
+        scrollWindowTo(profile?.scrollTop.zaps);
+        return;
+      }
+    })
+  );
 
   const onScroll = () => {
-    const scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
-    const tab = currentTab() as 'reads' | 'notes' | 'media' | 'replies' | 'zaps';
+    const scrollTop =
+      document.body.scrollTop || document.documentElement.scrollTop;
+    const tab = currentTab() as
+      | "reads"
+      | "notes"
+      | "media"
+      | "replies"
+      | "zaps";
 
     profile?.actions.updateScrollTop(scrollTop, tab);
-  }
+  };
 
   onMount(() => {
-    window.addEventListener('scroll', onScroll);
+    window.addEventListener("scroll", onScroll);
   });
 
   onCleanup(() => {
-    window.removeEventListener('scroll', onScroll);
+    window.removeEventListener("scroll", onScroll);
   });
 
   const noteLinkId = (note: PrimalNote) => {
     try {
       return `/e/${note.noteIdShort}`;
-    } catch(e) {
-      return '/404';
+    } catch (e) {
+      return "/404";
     }
   };
 
   return (
-      <Tabs value={hash()} onChange={onChangeValue} defaultValue={hash()}>
-        <Show when={profile && profile.fetchedUserStats}>
-          <Tabs.List class={styles.profileTabs}>
-            <Tabs.Trigger class={styles.profileTab} value="notes">
-              <div class={styles.stat}>
-                <div class={styles.statNumber}>
-                  {humanizeNumber(profile?.userStats?.note_count || 0)}
-                </div>
-                <div class={styles.statName}>
-                  {intl.formatMessage(t.stats.notes)}
-                </div>
+    <Tabs value={hash()} onChange={onChangeValue} defaultValue={hash()}>
+      <Show when={profile && profile.fetchedUserStats}>
+        <Tabs.List class={styles.profileTabs}>
+          <Tabs.Trigger class={styles.profileTab} value="notes">
+            <div class={styles.stat}>
+              <div class={styles.statNumber}>
+                {humanizeNumber(
+                  (profile?.userStats?.note_count || 0) -
+                    (profile?.userStats?.total_subscription_count || 0)
+                )}
               </div>
-            </Tabs.Trigger>
-
-            <Tabs.Trigger class={styles.profileTab} value="replies">
-              <div class={styles.stat}>
-                <div class={styles.statNumber}>
-                  {humanizeNumber(profile?.userStats?.reply_count || 0)}
-                </div>
-                <div class={styles.statName}>
-                  {intl.formatMessage(t.stats.replies)}
-                </div>
+              <div class={styles.statName}>
+                {intl.formatMessage(t.stats.notes)}
               </div>
-            </Tabs.Trigger>
+            </div>
+          </Tabs.Trigger>
 
-            <Tabs.Trigger class={styles.profileTab} value="reads">
-              <div class={styles.stat}>
-                <div class={styles.statNumber}>
-                  {humanizeNumber(profile?.userStats?.long_form_note_count || 0)}
-                </div>
-                <div class={styles.statName}>
-                  {intl.formatMessage(t.stats.articles)}
-                </div>
+          <Tabs.Trigger class={styles.profileTab} value="replies">
+            <div class={styles.stat}>
+              <div class={styles.statNumber}>
+                {humanizeNumber(profile?.userStats?.reply_count || 0)}
               </div>
-            </Tabs.Trigger>
-
-            <Tabs.Trigger class={styles.profileTab} value="media">
-              <div class={styles.stat}>
-                <div class={styles.statNumber}>
-                  {humanizeNumber(profile?.userStats.media_count || 0)}
-                </div>
-                <div class={styles.statName}>
-                  {intl.formatMessage(t.stats.gallery)}
-                </div>
+              <div class={styles.statName}>
+                {intl.formatMessage(t.stats.replies)}
               </div>
-            </Tabs.Trigger>
+            </div>
+          </Tabs.Trigger>
 
-            <Tabs.Trigger class={styles.profileTab} value="zaps">
-              <div class={styles.stat}>
-                <div class={styles.statNumber}>
-                  {humanizeNumber(profile?.userStats?.total_zap_count || 0)}
-                </div>
-                <div class={styles.statName}>
-                  {intl.formatMessage(t.stats.zaps)}
-                </div>
+          <Tabs.Trigger class={styles.profileTab} value="reads">
+            <div class={styles.stat}>
+              <div class={styles.statNumber}>
+                {humanizeNumber(profile?.userStats?.long_form_note_count || 0)}
               </div>
-            </Tabs.Trigger>
-
-            <Tabs.Trigger class={styles.profileTab} value="relays">
-              <div class={styles.stat}>
-                <div class={styles.statNumber}>
-                  {humanizeNumber(profile?.userStats?.relay_count || 0)}
-                </div>
-                <div class={styles.statName}>
-                  {intl.formatMessage(t.stats.relays)}
-                </div>
+              <div class={styles.statName}>
+                {intl.formatMessage(t.stats.articles)}
               </div>
-            </Tabs.Trigger>
+            </div>
+          </Tabs.Trigger>
 
+          <Tabs.Trigger class={styles.profileTab} value="media">
+            <div class={styles.stat}>
+              <div class={styles.statNumber}>
+                {humanizeNumber(profile?.userStats.media_count || 0)}
+              </div>
+              <div class={styles.statName}>
+                {intl.formatMessage(t.stats.gallery)}
+              </div>
+            </div>
+          </Tabs.Trigger>
 
-            <Tabs.Indicator class={styles.profileTabIndicator} />
-          </Tabs.List>
-        </Show>
+          <Tabs.Trigger class={styles.profileTab} value="zaps">
+            <div class={styles.stat}>
+              <div class={styles.statNumber}>
+                {humanizeNumber(profile?.userStats?.total_zap_count || 0)}
+              </div>
+              <div class={styles.statName}>
+                {intl.formatMessage(t.stats.zaps)}
+              </div>
+            </div>
+          </Tabs.Trigger>
 
-        <Tabs.Content class={styles.tabContent} value="reads">
-          <div class={styles.profileNotes}>
-            <Switch>
-              <Match when={isMuted(props.profileKey)}>
-                <div class={styles.mutedProfile}>
-                  {intl.formatMessage(
-                    t.isMuted,
-                    { name: profile?.userProfile ? userName(profile?.userProfile) : props.profileKey },
-                  )}
-                  <button
-                    onClick={unMuteProfile}
+          <Tabs.Trigger class={styles.profileTab} value="relays">
+            <div class={styles.stat}>
+              <div class={styles.statNumber}>
+                {humanizeNumber(profile?.userStats?.relay_count || 0)}
+              </div>
+              <div class={styles.statName}>
+                {intl.formatMessage(t.stats.relays)}
+              </div>
+            </div>
+          </Tabs.Trigger>
+
+          <Tabs.Trigger class={styles.profileTab} value="subscriptions">
+            <div class={styles.stat}>
+              <div class={styles.statNumber}>
+                {humanizeNumber(
+                  profile?.userStats?.total_subscription_count || 0
+                )}
+              </div>
+              <div class={styles.statName}>
+                {intl.formatMessage(t.stats.subscriptions)}
+              </div>
+            </div>
+          </Tabs.Trigger>
+
+          <Tabs.Indicator class={styles.profileTabIndicator} />
+        </Tabs.List>
+      </Show>
+
+      <Tabs.Content class={styles.tabContent} value="reads">
+        <div class={styles.profileNotes}>
+          <Switch>
+            <Match when={isMuted(props.profileKey)}>
+              <div class={styles.mutedProfile}>
+                {intl.formatMessage(t.isMuted, {
+                  name: profile?.userProfile
+                    ? userName(profile?.userProfile)
+                    : props.profileKey,
+                })}
+                <button onClick={unMuteProfile}>
+                  {intl.formatMessage(tActions.unmute)}
+                </button>
+              </div>
+            </Match>
+            <Match when={isFiltered()}>
+              <div class={styles.mutedProfile}>
+                {intl.formatMessage(t.isFiltered)}
+                <button onClick={addToAllowlist}>
+                  {intl.formatMessage(tActions.addToAllowlist)}
+                </button>
+              </div>
+            </Match>
+
+            <Match when={true}>
+              <TransitionGroup name="slide-fade">
+                <div>
+                  <Show
+                    when={
+                      profile &&
+                      profile.isFetching &&
+                      profile.articles.length === 0
+                    }
                   >
-                    {intl.formatMessage(tActions.unmute)}
-                  </button>
-                </div>
-              </Match>
-              <Match when={isFiltered()}>
-                <div class={styles.mutedProfile}>
-                  {intl.formatMessage(t.isFiltered)}
-                  <button
-                    onClick={addToAllowlist}
-                  >
-                    {intl.formatMessage(tActions.addToAllowlist)}
-                  </button>
-                </div>
-              </Match>
-
-
-              <Match when={true}>
-                <TransitionGroup name="slide-fade">
-                  <div>
-                    <Show when={profile && profile.isFetching && profile.articles.length === 0}>
-                      <div>
-                        <For each={new Array(10)}>
-                          {() => <ArticlePreviewSkeleton />}
-                        </For>
-                      </div>
-                    </Show>
-                  </div>
-
-                  <div>
-                    <Show when={profile && profile.articles.length === 0 && !profile.isFetching}>
-                      <div class={styles.mutedProfile}>
-                        {intl.formatMessage(
-                          t.noArticles,
-                          { name: profile?.userProfile ? userName(profile?.userProfile) : props.profileKey },
-                        )}
-                      </div>
-                    </Show>
-                  </div>
-
-                  <Show when={profile && profile.articles.length > 0}>
                     <div>
-                      <For each={profile?.articles}>
-                        {article => (
-                          <div class="animated">
-                            <ArticlePreview
-                              article={article}
-                              onClick={navigate}
-                              onRemove={(id: string) => {
-                                profile?.actions.removeEvent(id, 'articles');
-                              }}
-                            />
-                          </div>
-                        )}
+                      <For each={new Array(10)}>
+                        {() => <ArticlePreviewSkeleton />}
                       </For>
-                      <Paginator
-                        loadNextPage={() => {
-                          profile?.actions.getProfileMegaFeedNextPage(props.profileKey, 'reads');
-                          // profile?.actions.fetchNextArticlesPage();
-                        }}
-                        isSmall={true}
-                      />
                     </div>
                   </Show>
-                </TransitionGroup>
-              </Match>
-            </Switch>
-          </div>
-        </Tabs.Content>
-
-        <Tabs.Content class={styles.tabContent} value="notes">
-          <div class={styles.profileNotes}>
-            <Switch>
-              <Match when={isMuted(props.profileKey)}>
-                <div class={styles.mutedProfile}>
-                  {intl.formatMessage(
-                    t.isMuted,
-                    { name: profile?.userProfile ? userName(profile?.userProfile) : props.profileKey },
-                  )}
-                  <button
-                    onClick={unMuteProfile}
-                  >
-                    {intl.formatMessage(tActions.unmute)}
-                  </button>
                 </div>
-              </Match>
-              <Match when={isFiltered()}>
-                <div class={styles.mutedProfile}>
-                  {intl.formatMessage(t.isFiltered)}
-                  <button
-                    onClick={addToAllowlist}
+
+                <div>
+                  <Show
+                    when={
+                      profile &&
+                      profile.articles.length === 0 &&
+                      !profile.isFetching
+                    }
                   >
-                    {intl.formatMessage(tActions.addToAllowlist)}
-                  </button>
-                </div>
-              </Match>
-
-              <Match when={true}>
-                <TransitionGroup name="slide-fade">
-                  <div>
-                    <Show when={profile && profile.isFetching && profile.notes.length === 0}>
-                      <div>
-                        <For each={new Array(10)}>
-                          {() => <FeedNoteSkeleton />}
-                        </For>
-                      </div>
-                    </Show>
-                  </div>
-
-                  <div>
-                    <Show when={profile && profile.notes.length === 0 && !profile.isFetching}>
-                      <div class={styles.mutedProfile}>
-                        {intl.formatMessage(
-                          t.noNotes,
-                          { name: profile?.userProfile ? userName(profile?.userProfile) : props.profileKey },
-                        )}
-                      </div>
-                    </Show>
-                  </div>
-
-                  <Show when={profile && profile.notes.length > 0}>
-                    <div>
-                      <For each={profile?.notes}>
-                        {note => (
-                          <div class="animated">
-                            <Note
-                              note={note}
-                              shorten={true}
-                              onRemove={(id: string, isRepost?: boolean) => {
-                                if (note.pubkey !== account?.publicKey) {
-                                  profile?.actions.removeEvent(id, 'notes');
-                                  return;
-                                }
-                                profile?.actions.removeEvent(id, 'notes', isRepost);
-                              }}
-                            />
-                          </div>
-                        )}
-                      </For>
-                      <Paginator
-                        loadNextPage={() => {
-                          profile?.actions.getProfileMegaFeedNextPage(props.profileKey, 'notes');
-                          // profile?.actions.fetchNextPage();
-                        }}
-                        isSmall={true}
-                      />
+                    <div class={styles.mutedProfile}>
+                      {intl.formatMessage(t.noArticles, {
+                        name: profile?.userProfile
+                          ? userName(profile?.userProfile)
+                          : props.profileKey,
+                      })}
                     </div>
                   </Show>
-                </TransitionGroup>
-              </Match>
-            </Switch>
-          </div>
-        </Tabs.Content>
-
-        <Tabs.Content class={styles.tabContent} value="replies">
-          <div class={styles.profileNotes}>
-            <Switch>
-              <Match when={isMuted(props.profileKey)}>
-                <div class={styles.mutedProfile}>
-                  {intl.formatMessage(
-                    t.isMuted,
-                    { name: profile?.userProfile ? userName(profile?.userProfile) : props.profileKey },
-                  )}
-                  <button
-                    onClick={unMuteProfile}
-                  >
-                    {intl.formatMessage(tActions.unmute)}
-                  </button>
                 </div>
-              </Match>
-              <Match when={isFiltered()}>
-                <div class={styles.mutedProfile}>
-                  {intl.formatMessage(t.isFiltered)}
-                  <button
-                    onClick={addToAllowlist}
-                  >
-                    {intl.formatMessage(tActions.addToAllowlist)}
-                  </button>
-                </div>
-              </Match>
 
-              <Match when={true}>
-                <TransitionGroup name="slide-fade">
+                <Show when={profile && profile.articles.length > 0}>
                   <div>
-                    <Show when={profile && profile.isFetchingReplies && profile.replies.length === 0}>
-                      <div>
-                        <For each={new Array(10)}>
-                          {() => <FeedNoteSkeleton />}
-                        </For>
-                      </div>
-                    </Show>
-                  </div>
-
-                  <div>
-                    <Show when={profile && profile.replies.length === 0 && !profile.isFetchingReplies}>
-                      <div class={styles.mutedProfile}>
-                        {intl.formatMessage(
-                          t.noReplies,
-                          { name: profile?.userProfile ? userName(profile?.userProfile) : props.profileKey },
-                        )}
-                      </div>
-                    </Show>
-                  </div>
-
-                  <Show when={profile && profile.replies.length > 0}>
-                    <div>
-                      <For each={profile?.replies}>
-                        {reply => (
-                          <div class="animated">
-                            <Note
-                              note={reply}
-                              shorten={true}
-                              onRemove={(id: string) => {
-                                profile?.actions.removeEvent(id, 'replies');
-                              }}
-                            />
-                          </div>
-                        )}
-                      </For>
-                      <Paginator
-                        loadNextPage={() => {
-                          profile?.actions.getProfileMegaFeedNextPage(props.profileKey, 'replies');
-                          // profile?.actions.fetchNextRepliesPage();
-                        }}
-                        isSmall={true}
-                      />
-                    </div>
-                  </Show>
-                </TransitionGroup>
-              </Match>
-            </Switch>
-          </div>
-        </Tabs.Content>
-
-        <Tabs.Content class={styles.tabContent} value="media">
-          <div class={styles.profileNotes}>
-            <Switch>
-              <Match when={isMuted(props.profileKey)}>
-                <div class={styles.mutedProfile}>
-                  {intl.formatMessage(
-                    t.isMuted,
-                    { name: profile?.userProfile ? userName(profile?.userProfile) : props.profileKey },
-                  )}
-                  <button
-                    onClick={unMuteProfile}
-                  >
-                    {intl.formatMessage(tActions.unmute)}
-                  </button>
-                </div>
-              </Match>
-              <Match when={isFiltered()}>
-                <div class={styles.mutedProfile}>
-                  {intl.formatMessage(t.isFiltered)}
-                  <button
-                    onClick={addToAllowlist}
-                  >
-                    {intl.formatMessage(tActions.addToAllowlist)}
-                  </button>
-                </div>
-              </Match>
-              <Match when={true}>
-                  <div>
-                    <Show when={profile && profile.isFetchingGallery && profile.gallery.length === 0}>
-                      <div class={styles.galleryGrid}>
-                        <For each={new Array(24)}>
-                          {() => <ProfileGalleryImageSkeleton />}
-                        </For>
-                      </div>
-                    </Show>
-                  </div>
-
-                  <div>
-                    <Show when={profile && profile.gallery.length === 0 && !profile.isFetchingGallery}>
-                      <div class={styles.mutedProfile}>
-                        {intl.formatMessage(
-                          t.noReplies,
-                          { name: profile?.userProfile ? userName(profile?.userProfile) : props.profileKey },
-                        )}
-                      </div>
-                    </Show>
-                  </div>
-
-                  <Show when={profile && profile.gallery.length > 0}>
-                    <div class={styles.galleryGrid}>
-                      <For each={galleryImages()}>
-                        {(note) => (
-                          <Switch>
-                            <Match when={hasImages(note)}>
-                              <NoteGallery note={note} />
-                            </Match>
-                            <Match when={!hasImages(note)}>
-                              <A href={noteLinkId(note)} class={styles.missingImage}>
-                                <NoteGallery note={note} />
-                              </A>
-                            </Match>
-                          </Switch>
-                        )}
-                      </For>
-                    </div>
+                    <For each={profile?.articles}>
+                      {(article) => (
+                        <div class="animated">
+                          <ArticlePreview
+                            article={article}
+                            onClick={navigate}
+                            onRemove={(id: string) => {
+                              profile?.actions.removeEvent(id, "articles");
+                            }}
+                          />
+                        </div>
+                      )}
+                    </For>
                     <Paginator
                       loadNextPage={() => {
-                        profile?.actions.getProfileMegaFeedNextPage(props.profileKey, 'media');
-                        // profile?.actions.fetchNextGalleryPage();
+                        profile?.actions.getProfileMegaFeedNextPage(
+                          props.profileKey,
+                          "reads"
+                        );
+                        // profile?.actions.fetchNextArticlesPage();
                       }}
                       isSmall={true}
                     />
-                  </Show>
-              </Match>
-            </Switch>
-          </div>
-        </Tabs.Content>
+                  </div>
+                </Show>
+              </TransitionGroup>
+            </Match>
+          </Switch>
+        </div>
+      </Tabs.Content>
 
-        <Tabs.Content class={styles.tabContent} value="zaps">
-          <div class={styles.profileNotes}>
-            <TransitionGroup name="slide-fade">
-              <div>
-                <Show when={profile && profile.isFetchingZaps && profile.zaps.length === 0}>
+      <Tabs.Content class={styles.tabContent} value="notes">
+        <div class={styles.profileNotes}>
+          <Switch>
+            <Match when={isMuted(props.profileKey)}>
+              <div class={styles.mutedProfile}>
+                {intl.formatMessage(t.isMuted, {
+                  name: profile?.userProfile
+                    ? userName(profile?.userProfile)
+                    : props.profileKey,
+                })}
+                <button onClick={unMuteProfile}>
+                  {intl.formatMessage(tActions.unmute)}
+                </button>
+              </div>
+            </Match>
+            <Match when={isFiltered()}>
+              <div class={styles.mutedProfile}>
+                {intl.formatMessage(t.isFiltered)}
+                <button onClick={addToAllowlist}>
+                  {intl.formatMessage(tActions.addToAllowlist)}
+                </button>
+              </div>
+            </Match>
+
+            <Match when={true}>
+              <TransitionGroup name="slide-fade">
+                <div>
+                  <Show
+                    when={
+                      profile &&
+                      profile.isFetching &&
+                      profile.notes.length === 0
+                    }
+                  >
+                    <div>
+                      <For each={new Array(10)}>
+                        {() => <FeedNoteSkeleton />}
+                      </For>
+                    </div>
+                  </Show>
+                </div>
+
+                <div>
+                  <Show
+                    when={
+                      profile &&
+                      profile.notes.length === 0 &&
+                      !profile.isFetching
+                    }
+                  >
+                    <div class={styles.mutedProfile}>
+                      {intl.formatMessage(t.noNotes, {
+                        name: profile?.userProfile
+                          ? userName(profile?.userProfile)
+                          : props.profileKey,
+                      })}
+                    </div>
+                  </Show>
+                </div>
+
+                <Show when={profile && profile.notes.length > 0}>
                   <div>
-                    <For each={new Array(10)}>
-                      {() => <ZapSkeleton />}
+                    <For
+                      each={profile?.notes.filter(
+                        (note) =>
+                          !note.tags.some(
+                            (t) =>
+                              t[0] === "subscribers_only" && t[1] === "true"
+                          )
+                      )}
+                    >
+                      {(note) => (
+                        <div class="animated">
+                          <Note
+                            note={note}
+                            shorten={true}
+                            onRemove={(id: string, isRepost?: boolean) => {
+                              if (note.pubkey !== account?.publicKey) {
+                                profile?.actions.removeEvent(id, "notes");
+                                return;
+                              }
+                              profile?.actions.removeEvent(
+                                id,
+                                "notes",
+                                isRepost
+                              );
+                            }}
+                          />
+                        </div>
+                      )}
+                    </For>
+                    <Paginator
+                      loadNextPage={() => {
+                        profile?.actions.getProfileMegaFeedNextPage(
+                          props.profileKey,
+                          "notes"
+                        );
+                      }}
+                      isSmall={true}
+                    />
+                  </div>
+                </Show>
+              </TransitionGroup>
+            </Match>
+          </Switch>
+        </div>
+      </Tabs.Content>
+
+      <Tabs.Content class={styles.tabContent} value="replies">
+        <div class={styles.profileNotes}>
+          <Switch>
+            <Match when={isMuted(props.profileKey)}>
+              <div class={styles.mutedProfile}>
+                {intl.formatMessage(t.isMuted, {
+                  name: profile?.userProfile
+                    ? userName(profile?.userProfile)
+                    : props.profileKey,
+                })}
+                <button onClick={unMuteProfile}>
+                  {intl.formatMessage(tActions.unmute)}
+                </button>
+              </div>
+            </Match>
+            <Match when={isFiltered()}>
+              <div class={styles.mutedProfile}>
+                {intl.formatMessage(t.isFiltered)}
+                <button onClick={addToAllowlist}>
+                  {intl.formatMessage(tActions.addToAllowlist)}
+                </button>
+              </div>
+            </Match>
+
+            <Match when={true}>
+              <TransitionGroup name="slide-fade">
+                <div>
+                  <Show
+                    when={
+                      profile &&
+                      profile.isFetchingReplies &&
+                      profile.replies.length === 0
+                    }
+                  >
+                    <div>
+                      <For each={new Array(10)}>
+                        {() => <FeedNoteSkeleton />}
+                      </For>
+                    </div>
+                  </Show>
+                </div>
+
+                <div>
+                  <Show
+                    when={
+                      profile &&
+                      profile.replies.length === 0 &&
+                      !profile.isFetchingReplies
+                    }
+                  >
+                    <div class={styles.mutedProfile}>
+                      {intl.formatMessage(t.noReplies, {
+                        name: profile?.userProfile
+                          ? userName(profile?.userProfile)
+                          : props.profileKey,
+                      })}
+                    </div>
+                  </Show>
+                </div>
+
+                <Show when={profile && profile.replies.length > 0}>
+                  <div>
+                    <For each={profile?.replies}>
+                      {(reply) => (
+                        <div class="animated">
+                          <Note
+                            note={reply}
+                            shorten={true}
+                            onRemove={(id: string) => {
+                              profile?.actions.removeEvent(id, "replies");
+                            }}
+                          />
+                        </div>
+                      )}
+                    </For>
+                    <Paginator
+                      loadNextPage={() => {
+                        profile?.actions.getProfileMegaFeedNextPage(
+                          props.profileKey,
+                          "replies"
+                        );
+                        // profile?.actions.fetchNextRepliesPage();
+                      }}
+                      isSmall={true}
+                    />
+                  </div>
+                </Show>
+              </TransitionGroup>
+            </Match>
+          </Switch>
+        </div>
+      </Tabs.Content>
+
+      <Tabs.Content class={styles.tabContent} value="media">
+        <div class={styles.profileNotes}>
+          <Switch>
+            <Match when={isMuted(props.profileKey)}>
+              <div class={styles.mutedProfile}>
+                {intl.formatMessage(t.isMuted, {
+                  name: profile?.userProfile
+                    ? userName(profile?.userProfile)
+                    : props.profileKey,
+                })}
+                <button onClick={unMuteProfile}>
+                  {intl.formatMessage(tActions.unmute)}
+                </button>
+              </div>
+            </Match>
+            <Match when={isFiltered()}>
+              <div class={styles.mutedProfile}>
+                {intl.formatMessage(t.isFiltered)}
+                <button onClick={addToAllowlist}>
+                  {intl.formatMessage(tActions.addToAllowlist)}
+                </button>
+              </div>
+            </Match>
+            <Match when={true}>
+              <div>
+                <Show
+                  when={
+                    profile &&
+                    profile.isFetchingGallery &&
+                    profile.gallery.length === 0
+                  }
+                >
+                  <div class={styles.galleryGrid}>
+                    <For each={new Array(24)}>
+                      {() => <ProfileGalleryImageSkeleton />}
                     </For>
                   </div>
                 </Show>
               </div>
+
               <div>
-                <Show when={profile && !profile.isFetchingZaps && profile.zaps.length === 0}>
+                <Show
+                  when={
+                    profile &&
+                    profile.gallery.length === 0 &&
+                    !profile.isFetchingGallery
+                  }
+                >
                   <div class={styles.mutedProfile}>
-                    {intl.formatMessage(
-                      t.noZaps,
-                      { name: profile?.userProfile ? userName(profile?.userProfile) : props.profileKey },
-                    )}
+                    {intl.formatMessage(t.noReplies, {
+                      name: profile?.userProfile
+                        ? userName(profile?.userProfile)
+                        : props.profileKey,
+                    })}
                   </div>
                 </Show>
               </div>
 
-              <Show when={profile && profile.zaps.length > 0}>
-                <div class={styles.profileZaps}>
-                  <For each={profile?.zaps}>
-                    {zap =>
-                      <div class="animated">
-                        <ProfileNoteZap
-                          zap={zap}
-                          subject={getZapSubject(zap)}
-                        />
-                      </div>
-                    }
+              <Show when={profile && profile.gallery.length > 0}>
+                <div class={styles.galleryGrid}>
+                  <For each={galleryImages()}>
+                    {(note) => (
+                      <Switch>
+                        <Match when={hasImages(note)}>
+                          <NoteGallery note={note} />
+                        </Match>
+                        <Match when={!hasImages(note)}>
+                          <A
+                            href={noteLinkId(note)}
+                            class={styles.missingImage}
+                          >
+                            <NoteGallery note={note} />
+                          </A>
+                        </Match>
+                      </Switch>
+                    )}
                   </For>
-                  <Paginator loadNextPage={profile?.actions.fetchNextZapsPage} isSmall={true} />
+                </div>
+                <Paginator
+                  loadNextPage={() => {
+                    profile?.actions.getProfileMegaFeedNextPage(
+                      props.profileKey,
+                      "media"
+                    );
+                    // profile?.actions.fetchNextGalleryPage();
+                  }}
+                  isSmall={true}
+                />
+              </Show>
+            </Match>
+          </Switch>
+        </div>
+      </Tabs.Content>
+
+      <Tabs.Content class={styles.tabContent} value="zaps">
+        <div class={styles.profileNotes}>
+          <TransitionGroup name="slide-fade">
+            <div>
+              <Show
+                when={
+                  profile && profile.isFetchingZaps && profile.zaps.length === 0
+                }
+              >
+                <div>
+                  <For each={new Array(10)}>{() => <ZapSkeleton />}</For>
                 </div>
               </Show>
-            </TransitionGroup>
-          </div>
-        </Tabs.Content>
+            </div>
+            <div>
+              <Show
+                when={
+                  profile &&
+                  !profile.isFetchingZaps &&
+                  profile.zaps.length === 0
+                }
+              >
+                <div class={styles.mutedProfile}>
+                  {intl.formatMessage(t.noZaps, {
+                    name: profile?.userProfile
+                      ? userName(profile?.userProfile)
+                      : props.profileKey,
+                  })}
+                </div>
+              </Show>
+            </div>
 
+            <Show when={profile && profile.zaps.length > 0}>
+              <div class={styles.profileZaps}>
+                <For each={profile?.zaps}>
+                  {(zap) => (
+                    <div class="animated">
+                      <ProfileNoteZap zap={zap} subject={getZapSubject(zap)} />
+                    </div>
+                  )}
+                </For>
+                <Paginator
+                  loadNextPage={profile?.actions.fetchNextZapsPage}
+                  isSmall={true}
+                />
+              </div>
+            </Show>
+          </TransitionGroup>
+        </div>
+      </Tabs.Content>
 
-        <Tabs.Content class={styles.tabContent} value="relays">
-          <div class={styles.profileRelays}>
-            <Show
-              when={!profile?.isFetchingRelays}
+      <Tabs.Content class={styles.tabContent} value="relays">
+        <div class={styles.profileRelays}>
+          <Show
+            when={!profile?.isFetchingRelays}
+            fallback={
+              <div style="margin-top: 40px;">
+                <Loader />
+              </div>
+            }
+          >
+            <For
+              each={Object.keys(profile?.relays || {})}
               fallback={
-                <div style="margin-top: 40px;">
-                  <Loader />
+                <div class={styles.mutedProfile}>
+                  {intl.formatMessage(t.noRelays, {
+                    name: profile?.userProfile
+                      ? userName(profile?.userProfile)
+                      : props.profileKey,
+                  })}
                 </div>
               }
             >
-              <For
-                each={Object.keys(profile?.relays || {})}
+              {(relayUrl) => (
+                <div class={styles.profileRelay}>
+                  <div class={styles.relayIcon}></div>
+                  <div class={styles.relayUrl}>{relayUrl}</div>
+                  <ButtonCopy
+                    copyValue={relayUrl}
+                    label={intl.formatMessage(tActions.copy)}
+                  />
+                </div>
+              )}
+            </For>
+          </Show>
+        </div>
+      </Tabs.Content>
 
-                fallback={
-                  <div class={styles.mutedProfile}>
-                    {intl.formatMessage(
-                      t.noRelays,
-                      { name: profile?.userProfile ? userName(profile?.userProfile) : props.profileKey },
-                    )}
-                  </div>
-                }
+      <Tabs.Content class={styles.tabContent} value="subscriptions">
+        <div class={styles.profileNotes}>
+          <Show when={profile && profile.notes.length > 0 && account}>
+            <div>
+              <For
+                each={profile?.notes.filter((note) =>
+                  note.tags.some(
+                    (t) => t[0] === "subscribers_only" && t[1] === "true"
+                  )
+                )}
               >
-                {relayUrl => (
-                  <div class={styles.profileRelay}>
-                    <div class={styles.relayIcon}></div>
-                    <div class={styles.relayUrl}>
-                      {relayUrl}
+                {(note) => (
+                  <Show
+                    when={validateSubscriptionAccess(
+                      account?.publicKey,
+                      note.pubkey
+                    )}
+                    fallback={
+                      <div class={styles.noteLocked}>
+                        {/* Show a paywall/message for logged-in users without subscription */}
+                        {intl.formatMessage(t.posts?.subscribersOnly)}
+                        <SubscribeButton creatorPubkey={note.pubkey} />
+                      </div>
+                    }
+                  >
+                    <div class="animated">
+                      <Note note={note} shorten={true} />
                     </div>
-                    <ButtonCopy
-                      copyValue={relayUrl}
-                      label={intl.formatMessage(tActions.copy)}
-                    />
-                  </div>
+                  </Show>
                 )}
               </For>
-            </Show>
-          </div>
-        </Tabs.Content>
-      </Tabs>
+              <Paginator
+                loadNextPage={() => {
+                  profile?.actions.getProfileMegaFeedNextPage(
+                    props.profileKey,
+                    "subscriptions"
+                  );
+                }}
+                isSmall={true}
+              />
+            </div>
+          </Show>
+          <Show
+            when={
+              profile &&
+              (!account ||
+                profile.notes.filter((note) =>
+                  note.tags.some(
+                    (t) => t[0] === "subscribers_only" && t[1] === "true"
+                  )
+                ).length === 0)
+            }
+          >
+            <div class={styles.mutedProfile}>
+              {intl.formatMessage(tActions.noSubscriptionPosts)}
+            </div>
+          </Show>
+        </div>
+      </Tabs.Content>
+    </Tabs>
   );
-}
+};
 
 export default hookForDev(ProfileTabs);

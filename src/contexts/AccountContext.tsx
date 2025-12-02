@@ -570,6 +570,7 @@ export function AccountProvider(props: { children: JSXElement }) {
     updateStore("sec", () => undefined);
     updateStore("publicKey", () => undefined);
     localStorage.removeItem("pubkey");
+    localStorage.removeItem("wallet_mnemonic");
     clearSec();
   };
 
